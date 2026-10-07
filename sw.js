@@ -11,7 +11,7 @@
    ⚠️ SI VOUS MODIFIEZ CE FICHIER : augmentez le numéro de VERSION.
    ===================================================================== */
 
-const VERSION = 'home-v2';
+const VERSION = 'home-v3';
 const CACHE = 'labyrinthe-jeux';        // mémoire commune aux deux jeux et à l'accueil
 const DELAI_RESEAU_MS = 4000;
 
@@ -19,9 +19,9 @@ const DELAI_RESEAU_MS = 4000;
 const FICHIERS = [
   // Page d'accueil
   '/home/',
-  '/home/img/challenge-logo.png',
-  '/home/img/fond.webp',
-  '/home/img/logo-zarlor.png',
+  '/home/challenge-logo.png',
+  '/home/fond.webp',
+  '/home/logo-zarlor.png',
 
   // Challenge des Experts (fichiers actuels, inchangés)
   '/challenge-des-experts/',
