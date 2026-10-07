@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1E3F20">
+  <title>Les jeux du Labyrinthe – Labyrinthe En Champ-Thé</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Plus Jakarta Sans = police du Challenge ; Chewy = titre provisoire du Zarlor (remplacé par le logo dès qu'il est déposé) -->
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    /* ===== Couleurs ===== */
+    :root {
+      /* Challenge des Experts (charte existante) */
+      --ch-vert: #1E3F20;
+      --ch-vert-fonce: #122613;
+      --ch-or: #C59B27;
+      --ch-bois: #D1C7B7;
+      /* Le Zarlor Vivant (charte des pancartes) */
+      --zv-jaune: #FFD84D;
+      --zv-jaune-pale: #FFF3C2;
+      --zv-vert: #2F5E2A;
+      --zv-feuille: #4A9347;
+      /* Commun */
+      --fond: #F7F5F0;
+      --texte: #18231C;
+      --texte-doux: #4F5E53;
+      --blanc: #FFFFFF;
+
+      --pad: 20px;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    *, *::before, *::after { box-sizing: inherit; }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      color: var(--texte);
+      background-color: var(--fond);
+      background-image: linear-gradient(rgba(247,245,240,.93), rgba(247,245,240,.93)), url('img/fond.webp');
+      background-size: auto, 700px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 18px var(--pad) 40px;
+    }
+
+    /* ===== En-tête ===== */
+    .barre {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .btn-langue {
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 2px solid var(--ch-bois);
+      background: var(--blanc);
+      color: var(--ch-vert);
+      cursor: pointer;
+    }
+
+    .intro { margin: 10px 0 26px; }
+    .intro h1 {
+      margin: 0 0 6px;
+      font-size: clamp(30px, 8.5vw, 40px);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ch-vert-fonce);
+    }
+    .intro .lieu {
+      margin: 0 0 14px;
+      font-weight: 600;
+      color: var(--ch-or);
+      font-size: 15px;
+    }
+    .intro p.texte {
+      margin: 0;
+      font-size: 17px;
+      color: var(--texte-doux);
+    }
+
+    /* ===== Cartes des jeux ===== */
+    .jeux { display: grid; gap: 18px; }
+
+    .jeu {
+      border-radius: 22px;
+      padding: 22px var(--pad) 20px;
+      position: relative;
+    }
+    .jeu .type {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .jeu p.desc { margin: 12px 0 18px; font-size: 16px; }
+    .jeu .jouer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 56px;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .jeu .jouer:active { transform: scale(.98); }
+
+    /* Challenge */
+    .jeu.challenge {
+      background: var(--blanc);
+      border: 2px solid var(--ch-bois);
+      box-shadow: 0 6px 0 var(--ch-bois);
+    }
+    .jeu.challenge .type { background: #EFE6CF; color: #6B5414; }
+    .jeu.challenge .logo { display: block; width: 100%; max-width: 280px; height: auto; }
+    .jeu.challenge .jouer { background: var(--ch-vert); color: var(--blanc); }
+
+    /* Zarlor */
+    .jeu.zarlor {
+      background: var(--zv-jaune);
+      box-shadow: 0 6px 0 #E0B92C;
+    }
+    .jeu.zarlor .type { background: var(--zv-vert); color: var(--zv-jaune); }
+    .jeu.zarlor .titre-zarlor {
+      margin: 0;
+      font-family: 'Chewy', 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: clamp(38px, 11vw, 50px);
+      line-height: 1;
+      color: var(--zv-vert);
+    }
+    .jeu.zarlor .logo { display: none; width: 100%; max-width: 300px; height: auto; }
+    .jeu.zarlor.avec-logo .logo { display: block; }
+    .jeu.zarlor.avec-logo .titre-zarlor { display: none; }
+    .jeu.zarlor .zot {
+      margin: 6px 0 0;
+      font-weight: 700;
+      color: var(--zv-vert);
+    }
+    .jeu.zarlor p.desc { color: #2B2A12; }
+    .jeu.zarlor .jouer { background: var(--zv-vert); color: var(--zv-jaune); }
+
+    /* ===== Avant d'entrer ===== */
+    .avant {
+      margin-top: 30px;
+      background: var(--blanc);
+      border-radius: 18px;
+      padding: 20px var(--pad);
+      border: 2px dashed var(--ch-bois);
+    }
+    .avant h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--ch-vert-fonce);
+    }
+    .statuts { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+    .statuts li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .pastille {
+      flex: none;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 15px;
+      background: #EEE;
+    }
+    .statuts li[data-etat="ok"] .pastille { background: #D6EED9; }
+    .statuts li[data-etat="attente"] .pastille { background: #F3EBD3; }
+    .statuts li[data-etat="ko"] .pastille { background: #F6DCDC; }
+    .avant .conseils { margin: 0; padding-left: 20px; color: var(--texte-doux); font-size: 15px; }
+    .avant .conseils li + li { margin-top: 6px; }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--texte-doux);
+    }
+    footer a { color: var(--ch-vert); font-weight: 700; }
+
+    /* Focus visible au clavier */
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid var(--ch-or);
+      outline-offset: 3px;
+    }
+
+    /* Une seule animation : l'arrivée des deux cartes */
+    @media (prefers-reduced-motion: no-preference) {
+      .jeu { animation: arrivee .5s cubic-bezier(.2,.7,.3,1) both; }
+      .jeu.zarlor { animation-delay: .12s; }
+      @keyframes arrivee {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: none; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="barre">
+      <button class="btn-langue" id="btn-langue" type="button" aria-label="Switch to English">EN 🇬🇧</button>
+    </div>
+
+    <header class="intro">
+      <h1 data-t="titre">Les jeux du Labyrinthe</h1>
+      <p class="lieu">Labyrinthe En Champ-Thé, Grand-Coude</p>
+      <p class="texte" data-t="intro">Deux jeux à faire en même temps, au fil de votre balade. Scannez les pancartes dans l'ordre de votre choix et passez d'un jeu à l'autre quand vous voulez&nbsp;: chaque jeu garde votre progression.</p>
+    </header>
+
+    <main class="jeux">
+
+      <!-- Challenge des Experts -->
+      <section class="jeu challenge" aria-labelledby="titre-challenge">
+        <span class="type" data-t="type_challenge">Jeu permanent</span>
+        <h2 id="titre-challenge" style="margin:0">
+          <img class="logo" src="img/challenge-logo.png" alt="Challenge des Experts" width="280" height="99">
+        </h2>
+        <p class="desc" data-t="desc_challenge">L'histoire du thé et de Grand-Coude en 17 pancartes. Répondez aux questions et décodez les mots mystères.</p>
+        <a class="jouer" id="lien-challenge" href="/challenge-des-experts/" data-t="jouer_challenge">Jouer au Challenge</a>
+      </section>
+
+      <!-- Le Zarlor Vivant -->
+      <section class="jeu zarlor" id="carte-zarlor" aria-labelledby="titre-zarlor">
+        <span class="type" data-t="type_zarlor">Jeu éphémère</span>
+        <h2 id="titre-zarlor" style="margin:0">
+          <!-- Le logo s'affiche automatiquement dès que le fichier img/logo-zarlor.png existe -->
+          <img class="logo" id="logo-zarlor" src="img/logo-zarlor.png" alt="Le Zarlor Vivant">
+          <span class="titre-zarlor">Le Zarlor Vivant</span>
+        </h2>
+        <p class="zot">Zot té koné&nbsp;?</p>
+        <p class="desc" data-t="desc_zarlor">Partez à la rencontre des trésors vivants de La Réunion&nbsp;: faune et flore endémiques menacées, fruits et légumes lontan. 17 pancartes, 17 espèces à retrouver.</p>
+        <a class="jouer" id="lien-zarlor" href="/zarlor-vivant/" data-t="jouer_zarlor">Jouer au Zarlor</a>
+      </section>
+
+    </main>
+
+    <section class="avant" aria-labelledby="titre-avant">
+      <h2 id="titre-avant" data-t="avant_titre">Avant d'entrer</h2>
+      <ul class="statuts" aria-live="polite">
+        <li id="statut-challenge" data-etat="attente"><span class="pastille" aria-hidden="true">⏳</span><span class="txt">Challenge des Experts : préparation…</span></li>
+        <li id="statut-zarlor" data-etat="attente"><span class="pastille" aria-hidden="true">⏳</span><span class="txt">Le Zarlor Vivant : préparation…</span></li>
+      </ul>
+      <ul class="conseils">
+        <li data-t="conseil_reseau">Le réseau est faible dans la forêt&nbsp;: gardez cette page ouverte quelques secondes ici, les jeux s'enregistrent sur votre téléphone.</li>
+        <li data-t="conseil_scan">Pour scanner une pancarte, utilisez le bouton «&nbsp;Scanner&nbsp;» du jeu plutôt que l'appareil photo.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <a href="https://enchampthe.com" target="_blank" rel="noopener">enchampthe.com</a>
+    </footer>
+  </div>
+
+  <script>
+    /* ===================== TEXTES FR / EN ===================== */
+    const TEXTES = {
+      fr: {
+        titre: "Les jeux du Labyrinthe",
+        intro: "Deux jeux à faire en même temps, au fil de votre balade. Scannez les pancartes dans l'ordre de votre choix et passez d'un jeu à l'autre quand vous voulez\u00a0: chaque jeu garde votre progression.",
+        type_challenge: "Jeu permanent",
+        desc_challenge: "L'histoire du thé et de Grand-Coude en 17 pancartes. Répondez aux questions et décodez les mots mystères.",
+        jouer_challenge: "Jouer au Challenge",
+        type_zarlor: "Jeu éphémère",
+        desc_zarlor: "Partez à la rencontre des trésors vivants de La Réunion\u00a0: faune et flore endémiques menacées, fruits et légumes lontan. 17 pancartes, 17 espèces à retrouver.",
+        jouer_zarlor: "Jouer au Zarlor",
+        avant_titre: "Avant d'entrer",
+        conseil_reseau: "Le réseau est faible dans la forêt\u00a0: gardez cette page ouverte quelques secondes ici, les jeux s'enregistrent sur votre téléphone.",
+        conseil_scan: "Pour scanner une pancarte, utilisez le bouton «\u00a0Scanner\u00a0» du jeu plutôt que l'appareil photo.",
+        st_attente: "préparation…",
+        st_ok: "prêt, même sans réseau",
+        st_ko: "pas encore enregistré (réseau trop faible ?)",
+        st_indispo: "pas encore en ligne",
+        st_enligne: "fonctionne avec le réseau uniquement",
+        st_nonsupporte: "ce téléphone ne permet pas le mode hors ligne",
+        btn: "EN 🇬🇧",
+        btn_aria: "Switch to English"
+      },
+      en: {
+        titre: "The Labyrinth games",
+        intro: "Two games to play at the same time as you stroll. Scan the signs in any order and switch from one game to the other whenever you like: each game keeps your progress.",
+        type_challenge: "Permanent game",
+        desc_challenge: "The story of tea and Grand-Coude in 17 signs. Answer the questions and decode the mystery words.",
+        jouer_challenge: "Play the Challenge",
+        type_zarlor: "Limited-time game",
+        desc_zarlor: "Meet the living treasures of Réunion Island: endangered endemic wildlife and plants, and heritage \u201clontan\u201d fruits and vegetables. 17 signs, 17 species to find.",
+        jouer_zarlor: "Play the Zarlor",
+        avant_titre: "Before you go in",
+        conseil_reseau: "The network is weak in the forest: keep this page open here for a few seconds while the games save to your phone.",
+        conseil_scan: "To scan a sign, use the game's \u201cScan\u201d button rather than your camera app.",
+        st_attente: "getting ready…",
+        st_ok: "ready, even offline",
+        st_ko: "not saved yet (weak network?)",
+        st_indispo: "not online yet",
+        st_enligne: "works with a network connection only",
+        st_nonsupporte: "this phone does not support offline mode",
+        btn: "FR 🇫🇷",
+        btn_aria: "Passer en français"
+      }
+    };
+
+    /* ===================== LANGUE ===================== */
+    // Priorité : ?lang= dans l'adresse > choix mémorisé (partagé entre les jeux) > langue du téléphone
+    const CLE_LANGUE = 'labyrinthe_lang';
+    function langueDepart() {
+      const p = new URLSearchParams(location.search).get('lang');
+      if (p === 'fr' || p === 'en') return p;
+      try {
+        const m = localStorage.getItem(CLE_LANGUE);
+        if (m === 'fr' || m === 'en') return m;
+      } catch (e) {}
+      return (navigator.language || 'fr').toLowerCase().startsWith('en') ? 'en' : 'fr';
+    }
+    let langue = langueDepart();
+
+    function appliquerLangue() {
+      const t = TEXTES[langue];
+      document.documentElement.lang = langue;
+      document.querySelectorAll('[data-t]').forEach(el => {
+        const cle = el.getAttribute('data-t');
+        if (t[cle]) el.textContent = t[cle];
+      });
+      const btn = document.getElementById('btn-langue');
+      btn.textContent = t.btn;
+      btn.setAttribute('aria-label', t.btn_aria);
+      // Les liens transmettent la langue au jeu
+      document.getElementById('lien-challenge').href = '/challenge-des-experts/?lang=' + langue;
+      document.getElementById('lien-zarlor').href = '/zarlor-vivant/?lang=' + langue;
+      try { localStorage.setItem(CLE_LANGUE, langue); } catch (e) {}
+      afficherStatuts();
+    }
+    document.getElementById('btn-langue').addEventListener('click', () => {
+      langue = langue === 'fr' ? 'en' : 'fr';
+      appliquerLangue();
+    });
+
+    /* ===================== LOGO DU ZARLOR ===================== */
+    // Dès que img/logo-zarlor.png est déposé sur le dépôt, il remplace le titre en texte.
+    const logoZ = document.getElementById('logo-zarlor');
+    function logoCharge() { document.getElementById('carte-zarlor').classList.add('avec-logo'); }
+    if (logoZ.complete && logoZ.naturalWidth > 0) logoCharge();
+    logoZ.addEventListener('load', logoCharge);
+    logoZ.addEventListener('error', () => logoZ.remove());
+
+    /* ===================== MODE HORS LIGNE ===================== */
+    // État de chaque jeu : 'attente' | 'ok' | 'ko' | 'indispo' | 'nonsupporte'
+    const etats = { challenge: 'attente', zarlor: 'attente' };
+    const NOMS = { challenge: 'Challenge des Experts', zarlor: 'Le Zarlor Vivant' };
+    const ICONES = { attente: '⏳', ok: '✅', ko: '⚠️', enligne: '📶', indispo: '🕓', nonsupporte: 'ℹ️' };
+
+    function afficherStatuts() {
+      const t = TEXTES[langue];
+      for (const jeu of ['challenge', 'zarlor']) {
+        const li = document.getElementById('statut-' + jeu);
+        const e = etats[jeu];
+        li.dataset.etat = (e === 'ok' || e === 'ko') ? e : 'attente';
+        li.querySelector('.pastille').textContent = ICONES[e];
+        li.querySelector('.txt').textContent = NOMS[jeu] + (langue === 'fr' ? ' : ' : ': ') + t['st_' + e];
+      }
+    }
+
+    // Chaque jeu possède son propre fichier hors ligne (dans son dossier).
+    // Un jeu est « prêt sans réseau » si : sa page est enregistrée ET son fichier hors ligne est actif.
+    const PAGES = { challenge: '/challenge-des-experts/', zarlor: '/zarlor-vivant/' };
+
+    async function horsLigneActif(jeu) {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration(PAGES[jeu]);
+        return !!(reg && reg.active && new URL(reg.scope).pathname.startsWith(PAGES[jeu]));
+      } catch (e) { return false; }
+    }
+    async function pageExiste(jeu) {
+      try {
+        const r = await fetch(PAGES[jeu], { method: 'HEAD', cache: 'no-store' });
+        return r.ok;
+      } catch (e) { return null; } // null = pas de réseau, on ne sait pas
+    }
+
+    async function etatDe(jeu) {
+      const enregistre = !!(await caches.match(PAGES[jeu], { ignoreSearch: true }));
+      if (enregistre && await horsLigneActif(jeu)) return 'ok';
+      const existe = await pageExiste(jeu);
+      if (existe === false) return 'indispo';
+      if (existe === true) return 'enligne';
+      return 'ko';
+    }
+
+    async function verifierCache() {
+      for (const jeu of ['challenge', 'zarlor']) {
+        try { etats[jeu] = await etatDe(jeu); } catch (e) { etats[jeu] = 'ko'; }
+      }
+      afficherStatuts();
+    }
+
+    // Ouvre chaque jeu une fois, de façon invisible, pour qu'il active son propre mode hors ligne
+    // pendant que le visiteur est encore à l'entrée (là où il y a du réseau).
+    async function preparerJeux() {
+      for (const jeu of ['challenge', 'zarlor']) {
+        if (etats[jeu] !== 'enligne') continue;
+        const f = document.createElement('iframe');
+        f.src = PAGES[jeu];
+        f.title = '';
+        f.setAttribute('aria-hidden', 'true');
+        f.tabIndex = -1;
+        f.style.cssText = 'position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px';
+        document.body.appendChild(f);
+        setTimeout(() => { f.remove(); verifierCache(); }, 8000);
+      }
+    }
+
+    if ('serviceWorker' in navigator && 'caches' in window) {
+      navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready)
+        .then(verifierCache)
+        .then(preparerJeux)
+        .catch(verifierCache);
+      // Revérifie quand le réseau revient
+      window.addEventListener('online', () => setTimeout(verifierCache, 1500));
+      // Le service worker prévient quand l'enregistrement est terminé
+      navigator.serviceWorker.addEventListener('message', ev => {
+        if (ev.data && ev.data.type === 'precache-termine') verifierCache();
+      });
+    } else {
+      etats.challenge = etats.zarlor = 'nonsupporte';
+    }
+
+    appliquerLangue();
+  </script>
+</body>
+</html>
