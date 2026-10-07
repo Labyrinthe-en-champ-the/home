@@ -132,9 +132,10 @@
     .jeu.challenge .logo { display: block; width: 100%; max-width: 280px; height: auto; }
     .jeu.challenge .jouer { background: var(--ch-vert); color: var(--blanc); }
 
-    /* Zarlor */
+       /* Zarlor : fond blanc et liseré jaune, comme les pancartes (le texte du logo est jaune) */
     .jeu.zarlor {
-      background: var(--zv-jaune);
+      background: var(--blanc);
+      border: 3px solid var(--zv-jaune);
       box-shadow: 0 6px 0 #E0B92C;
     }
     .jeu.zarlor .type { background: var(--zv-vert); color: var(--zv-jaune); }
@@ -146,17 +147,17 @@
       line-height: 1;
       color: var(--zv-vert);
     }
-    .jeu.zarlor .logo { display: none; width: 100%; max-width: 300px; height: auto; }
+    .jeu.zarlor .logo { display: none; width: 62%; max-width: 230px; height: auto; margin: 0 auto; }
     .jeu.zarlor.avec-logo .logo { display: block; }
     .jeu.zarlor.avec-logo .titre-zarlor { display: none; }
     .jeu.zarlor .zot {
-      margin: 6px 0 0;
+      margin: 10px 0 0;
       font-weight: 700;
       color: var(--zv-vert);
     }
-    .jeu.zarlor p.desc { color: #2B2A12; }
+    .jeu.zarlor.avec-logo .zot { text-align: center; }
+    .jeu.zarlor p.desc { color: var(--texte); }
     .jeu.zarlor .jouer { background: var(--zv-vert); color: var(--zv-jaune); }
-
     /* ===== Avant d'entrer ===== */
     .avant {
       margin-top: 30px;
