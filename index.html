@@ -42,7 +42,7 @@
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       color: var(--texte);
       background-color: var(--fond);
-      background-image: linear-gradient(rgba(247,245,240,.93), rgba(247,245,240,.93)), url('img/fond.webp');
+      background-image: linear-gradient(rgba(247,245,240,.93), rgba(247,245,240,.93)), url('fond.webp');
       background-size: auto, 700px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
@@ -237,7 +237,7 @@
       <section class="jeu challenge" aria-labelledby="titre-challenge">
         <span class="type" data-t="type_challenge">Jeu permanent</span>
         <h2 id="titre-challenge" style="margin:0">
-          <img class="logo" src="img/challenge-logo.png" alt="Challenge des Experts" width="280" height="99">
+          <img class="logo" src="challenge-logo.png" alt="Challenge des Experts" width="280" height="99">
         </h2>
         <p class="desc" data-t="desc_challenge">L'histoire du thé et de Grand-Coude en 17 pancartes. Répondez aux questions et décodez les mots mystères.</p>
         <a class="jouer" id="lien-challenge" href="/challenge-des-experts/" data-t="jouer_challenge">Jouer au Challenge</a>
@@ -247,8 +247,8 @@
       <section class="jeu zarlor" id="carte-zarlor" aria-labelledby="titre-zarlor">
         <span class="type" data-t="type_zarlor">Jeu éphémère</span>
         <h2 id="titre-zarlor" style="margin:0">
-          <!-- Le logo s'affiche automatiquement dès que le fichier img/logo-zarlor.png existe -->
-          <img class="logo" id="logo-zarlor" src="img/logo-zarlor.png" alt="Le Zarlor Vivant">
+          <!-- Le logo s'affiche automatiquement dès que le fichier logo-zarlor.png existe -->
+          <img class="logo" id="logo-zarlor" src="logo-zarlor.png" alt="Le Zarlor Vivant">
           <span class="titre-zarlor">Le Zarlor Vivant</span>
         </h2>
         <p class="zot">Zot té koné&nbsp;?</p>
@@ -352,101 +352,4 @@
       try { localStorage.setItem(CLE_LANGUE, langue); } catch (e) {}
       afficherStatuts();
     }
-    document.getElementById('btn-langue').addEventListener('click', () => {
-      langue = langue === 'fr' ? 'en' : 'fr';
-      appliquerLangue();
-    });
-
-    /* ===================== LOGO DU ZARLOR ===================== */
-    // Dès que img/logo-zarlor.png est déposé sur le dépôt, il remplace le titre en texte.
-    const logoZ = document.getElementById('logo-zarlor');
-    function logoCharge() { document.getElementById('carte-zarlor').classList.add('avec-logo'); }
-    if (logoZ.complete && logoZ.naturalWidth > 0) logoCharge();
-    logoZ.addEventListener('load', logoCharge);
-    logoZ.addEventListener('error', () => logoZ.remove());
-
-    /* ===================== MODE HORS LIGNE ===================== */
-    // État de chaque jeu : 'attente' | 'ok' | 'ko' | 'indispo' | 'nonsupporte'
-    const etats = { challenge: 'attente', zarlor: 'attente' };
-    const NOMS = { challenge: 'Challenge des Experts', zarlor: 'Le Zarlor Vivant' };
-    const ICONES = { attente: '⏳', ok: '✅', ko: '⚠️', enligne: '📶', indispo: '🕓', nonsupporte: 'ℹ️' };
-
-    function afficherStatuts() {
-      const t = TEXTES[langue];
-      for (const jeu of ['challenge', 'zarlor']) {
-        const li = document.getElementById('statut-' + jeu);
-        const e = etats[jeu];
-        li.dataset.etat = (e === 'ok' || e === 'ko') ? e : 'attente';
-        li.querySelector('.pastille').textContent = ICONES[e];
-        li.querySelector('.txt').textContent = NOMS[jeu] + (langue === 'fr' ? ' : ' : ': ') + t['st_' + e];
-      }
-    }
-
-    // Chaque jeu possède son propre fichier hors ligne (dans son dossier).
-    // Un jeu est « prêt sans réseau » si : sa page est enregistrée ET son fichier hors ligne est actif.
-    const PAGES = { challenge: '/challenge-des-experts/', zarlor: '/zarlor-vivant/' };
-
-    async function horsLigneActif(jeu) {
-      try {
-        const reg = await navigator.serviceWorker.getRegistration(PAGES[jeu]);
-        return !!(reg && reg.active && new URL(reg.scope).pathname.startsWith(PAGES[jeu]));
-      } catch (e) { return false; }
-    }
-    async function pageExiste(jeu) {
-      try {
-        const r = await fetch(PAGES[jeu], { method: 'HEAD', cache: 'no-store' });
-        return r.ok;
-      } catch (e) { return null; } // null = pas de réseau, on ne sait pas
-    }
-
-    async function etatDe(jeu) {
-      const enregistre = !!(await caches.match(PAGES[jeu], { ignoreSearch: true }));
-      if (enregistre && await horsLigneActif(jeu)) return 'ok';
-      const existe = await pageExiste(jeu);
-      if (existe === false) return 'indispo';
-      if (existe === true) return 'enligne';
-      return 'ko';
-    }
-
-    async function verifierCache() {
-      for (const jeu of ['challenge', 'zarlor']) {
-        try { etats[jeu] = await etatDe(jeu); } catch (e) { etats[jeu] = 'ko'; }
-      }
-      afficherStatuts();
-    }
-
-    // Ouvre chaque jeu une fois, de façon invisible, pour qu'il active son propre mode hors ligne
-    // pendant que le visiteur est encore à l'entrée (là où il y a du réseau).
-    async function preparerJeux() {
-      for (const jeu of ['challenge', 'zarlor']) {
-        if (etats[jeu] !== 'enligne') continue;
-        const f = document.createElement('iframe');
-        f.src = PAGES[jeu];
-        f.title = '';
-        f.setAttribute('aria-hidden', 'true');
-        f.tabIndex = -1;
-        f.style.cssText = 'position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px';
-        document.body.appendChild(f);
-        setTimeout(() => { f.remove(); verifierCache(); }, 8000);
-      }
-    }
-
-    if ('serviceWorker' in navigator && 'caches' in window) {
-      navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready)
-        .then(verifierCache)
-        .then(preparerJeux)
-        .catch(verifierCache);
-      // Revérifie quand le réseau revient
-      window.addEventListener('online', () => setTimeout(verifierCache, 1500));
-      // Le service worker prévient quand l'enregistrement est terminé
-      navigator.serviceWorker.addEventListener('message', ev => {
-        if (ev.data && ev.data.type === 'precache-termine') verifierCache();
-      });
-    } else {
-      etats.challenge = etats.zarlor = 'nonsupporte';
-    }
-
-    appliquerLangue();
-  </script>
-</body>
-</html>
+    document.getElementById('btn-langue').addEve
