@@ -132,7 +132,7 @@
     .jeu.challenge .logo { display: block; width: 100%; max-width: 280px; height: auto; }
     .jeu.challenge .jouer { background: var(--ch-vert); color: var(--blanc); }
 
-       /* Zarlor : fond blanc et liseré jaune, comme les pancartes (le texte du logo est jaune) */
+    /* Zarlor : fond blanc et liseré jaune, comme les pancartes (le texte du logo est jaune) */
     .jeu.zarlor {
       background: var(--blanc);
       border: 3px solid var(--zv-jaune);
@@ -158,6 +158,9 @@
     .jeu.zarlor.avec-logo .zot { text-align: center; }
     .jeu.zarlor p.desc { color: var(--texte); }
     .jeu.zarlor .jouer { background: var(--zv-vert); color: var(--zv-jaune); }
+    .jeu.zarlor.bientot .jouer { background: #E9E5D8; color: #5C6B60; cursor: default; }
+    .jeu.zarlor.bientot .type { background: var(--ch-or); color: var(--blanc); }
+
     /* ===== Avant d'entrer ===== */
     .avant {
       margin-top: 30px;
@@ -277,6 +280,8 @@
   </div>
 
   <script>
+    let zarlorFerme = false;   // mis à jour d'après zarlor.json ("disponible")
+
     /* ===================== TEXTES FR / EN ===================== */
     const TEXTES = {
       fr: {
@@ -288,6 +293,8 @@
         type_zarlor: "Jeu éphémère",
         desc_zarlor: "Partez à la rencontre des trésors vivants de La Réunion\u00a0: faune et flore endémiques menacées, fruits et légumes lontan. 17 pancartes, 17 espèces à retrouver.",
         jouer_zarlor: "Jouer au Zarlor",
+        bientot_badge: "Bientôt disponible",
+        bientot_bouton: "Bientôt disponible",
         avant_titre: "Avant d'entrer",
         conseil_reseau: "Le réseau est faible dans la forêt\u00a0: gardez cette page ouverte quelques secondes ici, les jeux s'enregistrent sur votre téléphone.",
         conseil_scan: "Pour scanner une pancarte, utilisez le bouton «\u00a0Scanner\u00a0» du jeu plutôt que l'appareil photo.",
@@ -295,7 +302,8 @@
         st_ok: "prêt, même sans réseau",
         st_ko: "pas encore enregistré (réseau trop faible ?)",
         st_indispo: "pas encore en ligne",
-        st_enligne: "fonctionne avec le réseau uniquement",
+        st_enligne: "disponible (nécessite du réseau)",
+        st_bientot: "bientôt disponible",
         st_nonsupporte: "ce téléphone ne permet pas le mode hors ligne",
         btn: "EN 🇬🇧",
         btn_aria: "Switch to English"
@@ -309,6 +317,8 @@
         type_zarlor: "Limited-time game",
         desc_zarlor: "Meet the living treasures of Réunion Island: endangered endemic wildlife and plants, and heritage \u201clontan\u201d fruits and vegetables. 17 signs, 17 species to find.",
         jouer_zarlor: "Play the Zarlor",
+        bientot_badge: "Coming soon",
+        bientot_bouton: "Coming soon",
         avant_titre: "Before you go in",
         conseil_reseau: "The network is weak in the forest: keep this page open here for a few seconds while the games save to your phone.",
         conseil_scan: "To scan a sign, use the game's \u201cScan\u201d button rather than your camera app.",
@@ -316,7 +326,8 @@
         st_ok: "ready, even offline",
         st_ko: "not saved yet (weak network?)",
         st_indispo: "not online yet",
-        st_enligne: "works with a network connection only",
+        st_enligne: "available (needs a network connection)",
+        st_bientot: "coming soon",
         st_nonsupporte: "this phone does not support offline mode",
         btn: "FR 🇫🇷",
         btn_aria: "Passer en français"
@@ -352,11 +363,33 @@
       document.getElementById('lien-zarlor').href = '/zarlor-vivant/?lang=' + langue;
       try { localStorage.setItem(CLE_LANGUE, langue); } catch (e) {}
       afficherStatuts();
+      if (typeof appliquerOuverture === 'function') appliquerOuverture();
     }
     document.getElementById('btn-langue').addEventListener('click', () => {
       langue = langue === 'fr' ? 'en' : 'fr';
       appliquerLangue();
     });
+
+    /* ===================== ZARLOR : BIENTÔT DISPONIBLE ? ===================== */
+    // L'interrupteur se trouve dans zarlor.json (dépôt zarlor-vivant) : "disponible": true / false
+    function appliquerOuverture() {
+      const t = TEXTES[langue];
+      const carte = document.getElementById('carte-zarlor');
+      const lien = document.getElementById('lien-zarlor');
+      carte.classList.toggle('bientot', zarlorFerme);
+      if (zarlorFerme) {
+        carte.querySelector('.type').textContent = t.bientot_badge;
+        lien.textContent = t.bientot_bouton;
+        lien.removeAttribute('href');
+        lien.setAttribute('aria-disabled', 'true');
+      } else {
+        lien.removeAttribute('aria-disabled');
+      }
+    }
+    fetch('/zarlor-vivant/zarlor.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { zarlorFerme = !!(d && d.ouverture && d.ouverture.disponible === false); appliquerLangue(); })
+      .catch(() => {});
 
     /* ===================== LOGO DU ZARLOR ===================== */
     // Dès que logo-zarlor.png est déposé sur le dépôt, il remplace le titre en texte.
@@ -367,21 +400,24 @@
     logoZ.addEventListener('error', () => logoZ.remove());
 
     /* ===================== MODE HORS LIGNE ===================== */
+    // État de chaque jeu : 'attente' | 'ok' | 'ko' | 'indispo' | 'nonsupporte'
     const etats = { challenge: 'attente', zarlor: 'attente' };
     const NOMS = { challenge: 'Challenge des Experts', zarlor: 'Le Zarlor Vivant' };
-    const ICONES = { attente: '⏳', ok: '✅', ko: '⚠️', enligne: '📶', indispo: '🕓', nonsupporte: 'ℹ️' };
+    const ICONES = { attente: '⏳', ok: '✅', ko: '⚠️', enligne: '✅', indispo: '🕓', bientot: '🕓', nonsupporte: 'ℹ️' };
 
     function afficherStatuts() {
       const t = TEXTES[langue];
       for (const jeu of ['challenge', 'zarlor']) {
         const li = document.getElementById('statut-' + jeu);
-        const e = etats[jeu];
-        li.dataset.etat = (e === 'ok' || e === 'ko') ? e : 'attente';
+        const e = (jeu === 'zarlor' && zarlorFerme) ? 'bientot' : etats[jeu];
+        li.dataset.etat = (e === 'ok' || e === 'enligne') ? 'ok' : (e === 'ko' ? 'ko' : 'attente');
         li.querySelector('.pastille').textContent = ICONES[e];
         li.querySelector('.txt').textContent = NOMS[jeu] + (langue === 'fr' ? ' : ' : ': ') + t['st_' + e];
       }
     }
 
+    // Chaque jeu possède son propre fichier hors ligne (dans son dossier).
+    // Un jeu est « prêt sans réseau » si : sa page est enregistrée ET son fichier hors ligne est actif.
     const PAGES = { challenge: '/challenge-des-experts/', zarlor: '/zarlor-vivant/' };
 
     async function horsLigneActif(jeu) {
@@ -394,7 +430,7 @@
       try {
         const r = await fetch(PAGES[jeu], { method: 'HEAD', cache: 'no-store' });
         return r.ok;
-      } catch (e) { return null; }
+      } catch (e) { return null; } // null = pas de réseau, on ne sait pas
     }
 
     async function etatDe(jeu) {
@@ -413,6 +449,8 @@
       afficherStatuts();
     }
 
+    // Ouvre chaque jeu une fois, de façon invisible, pour qu'il active son propre mode hors ligne
+    // pendant que le visiteur est encore à l'entrée (là où il y a du réseau).
     async function preparerJeux() {
       for (const jeu of ['challenge', 'zarlor']) {
         if (etats[jeu] !== 'enligne') continue;
@@ -432,7 +470,9 @@
         .then(verifierCache)
         .then(preparerJeux)
         .catch(verifierCache);
+      // Revérifie quand le réseau revient
       window.addEventListener('online', () => setTimeout(verifierCache, 1500));
+      // Le service worker prévient quand l'enregistrement est terminé
       navigator.serviceWorker.addEventListener('message', ev => {
         if (ev.data && ev.data.type === 'precache-termine') verifierCache();
       });
