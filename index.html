@@ -353,4 +353,94 @@
       try { localStorage.setItem(CLE_LANGUE, langue); } catch (e) {}
       afficherStatuts();
     }
-    document.getElementById('btn-langue').addEve
+    document.getElementById('btn-langue').addEventListener('click', () => {
+      langue = langue === 'fr' ? 'en' : 'fr';
+      appliquerLangue();
+    });
+
+    /* ===================== LOGO DU ZARLOR ===================== */
+    // Dès que logo-zarlor.png est déposé sur le dépôt, il remplace le titre en texte.
+    const logoZ = document.getElementById('logo-zarlor');
+    function logoCharge() { document.getElementById('carte-zarlor').classList.add('avec-logo'); }
+    if (logoZ.complete && logoZ.naturalWidth > 0) logoCharge();
+    logoZ.addEventListener('load', logoCharge);
+    logoZ.addEventListener('error', () => logoZ.remove());
+
+    /* ===================== MODE HORS LIGNE ===================== */
+    const etats = { challenge: 'attente', zarlor: 'attente' };
+    const NOMS = { challenge: 'Challenge des Experts', zarlor: 'Le Zarlor Vivant' };
+    const ICONES = { attente: '⏳', ok: '✅', ko: '⚠️', enligne: '📶', indispo: '🕓', nonsupporte: 'ℹ️' };
+
+    function afficherStatuts() {
+      const t = TEXTES[langue];
+      for (const jeu of ['challenge', 'zarlor']) {
+        const li = document.getElementById('statut-' + jeu);
+        const e = etats[jeu];
+        li.dataset.etat = (e === 'ok' || e === 'ko') ? e : 'attente';
+        li.querySelector('.pastille').textContent = ICONES[e];
+        li.querySelector('.txt').textContent = NOMS[jeu] + (langue === 'fr' ? ' : ' : ': ') + t['st_' + e];
+      }
+    }
+
+    const PAGES = { challenge: '/challenge-des-experts/', zarlor: '/zarlor-vivant/' };
+
+    async function horsLigneActif(jeu) {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration(PAGES[jeu]);
+        return !!(reg && reg.active && new URL(reg.scope).pathname.startsWith(PAGES[jeu]));
+      } catch (e) { return false; }
+    }
+    async function pageExiste(jeu) {
+      try {
+        const r = await fetch(PAGES[jeu], { method: 'HEAD', cache: 'no-store' });
+        return r.ok;
+      } catch (e) { return null; }
+    }
+
+    async function etatDe(jeu) {
+      const enregistre = !!(await caches.match(PAGES[jeu], { ignoreSearch: true }));
+      if (enregistre && await horsLigneActif(jeu)) return 'ok';
+      const existe = await pageExiste(jeu);
+      if (existe === false) return 'indispo';
+      if (existe === true) return 'enligne';
+      return 'ko';
+    }
+
+    async function verifierCache() {
+      for (const jeu of ['challenge', 'zarlor']) {
+        try { etats[jeu] = await etatDe(jeu); } catch (e) { etats[jeu] = 'ko'; }
+      }
+      afficherStatuts();
+    }
+
+    async function preparerJeux() {
+      for (const jeu of ['challenge', 'zarlor']) {
+        if (etats[jeu] !== 'enligne') continue;
+        const f = document.createElement('iframe');
+        f.src = PAGES[jeu];
+        f.title = '';
+        f.setAttribute('aria-hidden', 'true');
+        f.tabIndex = -1;
+        f.style.cssText = 'position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px';
+        document.body.appendChild(f);
+        setTimeout(() => { f.remove(); verifierCache(); }, 8000);
+      }
+    }
+
+    if ('serviceWorker' in navigator && 'caches' in window) {
+      navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready)
+        .then(verifierCache)
+        .then(preparerJeux)
+        .catch(verifierCache);
+      window.addEventListener('online', () => setTimeout(verifierCache, 1500));
+      navigator.serviceWorker.addEventListener('message', ev => {
+        if (ev.data && ev.data.type === 'precache-termine') verifierCache();
+      });
+    } else {
+      etats.challenge = etats.zarlor = 'nonsupporte';
+    }
+
+    appliquerLangue();
+  </script>
+</body>
+</html>
