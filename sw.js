@@ -11,7 +11,7 @@
    ⚠️ SI VOUS MODIFIEZ CE FICHIER : augmentez le numéro de VERSION.
    ===================================================================== */
 
-const VERSION = 'home-v3';
+const VERSION = 'home-v5';
 const CACHE = 'labyrinthe-jeux';        // mémoire commune aux deux jeux et à l'accueil
 const DELAI_RESEAU_MS = 4000;
 
@@ -29,13 +29,14 @@ const FICHIERS = [
   '/challenge-des-experts/width_1599.webp',
   'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
 
-  // Le Zarlor Vivant (liste complétée lors de sa livraison)
+  // Le Zarlor Vivant
   '/zarlor-vivant/',
   '/zarlor-vivant/style.css',
   '/zarlor-vivant/app.js',
-  '/zarlor-vivant/data/zarlor.json',
-  '/zarlor-vivant/lib/html5-qrcode.min.js',
-  '/zarlor-vivant/img/logo-zarlor.png'
+  '/zarlor-vivant/zarlor.json',
+  '/zarlor-vivant/logo-zarlor.png',
+  '/zarlor-vivant/chewy.woff2',
+  '/zarlor-vivant/plus-jakarta-sans.woff2'
 ];
 
 // Feuilles de style Google Fonts (accueil + Challenge) : les fichiers de police sont aussi téléchargés.
