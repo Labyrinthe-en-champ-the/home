@@ -7,7 +7,7 @@
   <title>Les jeux du Labyrinthe – Labyrinthe En Champ-Thé</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Plus Jakarta Sans = police du Challenge ; Chewy = titre provisoire du Zarlor (remplacé par le logo dès qu'il est déposé) -->
+  <!-- Plus Jakarta Sans = police du Challenge ; Chewy = titre provisoire du Zarlor -->
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <style>
@@ -72,7 +72,7 @@
       cursor: pointer;
     }
 
-    .intro { margin: 10px 0 26px; }
+    .intro { margin: 4px 0 16px; }
     .intro h1 {
       margin: 0 0 6px;
       font-size: clamp(30px, 8.5vw, 40px);
@@ -89,16 +89,16 @@
     }
     .intro p.texte {
       margin: 0;
-      font-size: 17px;
+      font-size: 16px;
       color: var(--texte-doux);
     }
 
     /* ===== Cartes des jeux ===== */
-    .jeux { display: grid; gap: 18px; }
+    .jeux { display: grid; gap: 14px; }
 
     .jeu {
       border-radius: 22px;
-      padding: 22px var(--pad) 20px;
+      padding: 16px var(--pad) 16px;
       position: relative;
     }
     .jeu .type {
@@ -107,14 +107,14 @@
       font-weight: 700;
       padding: 4px 11px;
       border-radius: 999px;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
-    .jeu p.desc { margin: 12px 0 18px; font-size: 16px; }
+    .jeu p.desc { margin: 6px 0 12px; font-size: 15px; }
     .jeu .jouer {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 56px;
+      min-height: 50px;
       border-radius: 14px;
       font-size: 18px;
       font-weight: 800;
@@ -129,10 +129,10 @@
       box-shadow: 0 6px 0 var(--ch-bois);
     }
     .jeu.challenge .type { background: #EFE6CF; color: #6B5414; }
-    .jeu.challenge .logo { display: block; width: 100%; max-width: 280px; height: auto; }
+    .jeu.challenge .logo { display: block; width: 100%; max-width: 220px; height: auto; }
     .jeu.challenge .jouer { background: var(--ch-vert); color: var(--blanc); }
 
-    /* Zarlor : fond blanc et liseré jaune, comme les pancartes (le texte du logo est jaune) */
+    /* Zarlor */
     .jeu.zarlor {
       background: var(--blanc);
       border: 3px solid var(--zv-jaune);
@@ -147,11 +147,11 @@
       line-height: 1;
       color: var(--zv-vert);
     }
-    .jeu.zarlor .logo { display: none; width: 42%; max-width: 160px; height: auto; margin: 0 auto; }
+    .jeu.zarlor .logo { display: none; width: 30%; max-width: 110px; height: auto; margin: 0 auto; }
     .jeu.zarlor.avec-logo .logo { display: block; }
     .jeu.zarlor.avec-logo .titre-zarlor { display: none; }
     .jeu.zarlor .zot {
-      margin: 10px 0 0;
+      margin: 4px 0 0;
       font-weight: 700;
       color: var(--zv-vert);
     }
@@ -161,9 +161,121 @@
     .jeu.zarlor.bientot .jouer { background: #E9E5D8; color: #5C6B60; cursor: default; }
     .jeu.zarlor.bientot .type { background: var(--ch-or); color: var(--blanc); }
 
+    /* ===== Mini-Jeu : Thé ou Café ===== */
+    .quiz-section {
+      margin-top: 24px;
+      background: var(--blanc);
+      border: 2px solid var(--ch-bois);
+      border-radius: 20px;
+      padding: 20px var(--pad);
+      box-shadow: 0 4px 0 var(--ch-bois);
+    }
+    .quiz-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #EFE6CF;
+      color: #6B5414;
+      margin-bottom: 8px;
+    }
+    .quiz-titre {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--ch-vert-fonce);
+    }
+    .quiz-intro {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: var(--texte-doux);
+    }
+    .quiz-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .quiz-vignette {
+      position: relative;
+      background: var(--fond);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--ch-bois);
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .quiz-vignette img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .quiz-label {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--ch-vert-fonce);
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .quiz-boutons {
+      display: grid;
+      gap: 10px;
+    }
+    .quiz-btn {
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 2px solid var(--ch-bois);
+      background: var(--fond);
+      color: var(--ch-vert-fonce);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .quiz-btn:active { transform: scale(0.98); }
+    .quiz-btn:hover {
+      background: #EFECE6;
+      border-color: var(--ch-or);
+    }
+    .quiz-reponse {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #F4F8F3;
+      border: 1px solid #D6EED9;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .quiz-reponse-titre {
+      font-weight: 800;
+      font-size: 15px;
+      margin: 0 0 8px;
+    }
+    .quiz-reponse p { margin: 6px 0; }
+    .quiz-reponse .detail { color: var(--texte); }
+
     /* ===== Avant d'entrer ===== */
     .avant {
-      margin-top: 30px;
+      margin-top: 24px;
       background: var(--blanc);
       border-radius: 18px;
       padding: 20px var(--pad);
@@ -211,7 +323,7 @@
       outline-offset: 3px;
     }
 
-    /* Une seule animation : l'arrivée des deux cartes */
+    /* Animation d'arrivée */
     @media (prefers-reduced-motion: no-preference) {
       .jeu { animation: arrivee .5s cubic-bezier(.2,.7,.3,1) both; }
       .jeu.zarlor { animation-delay: .12s; }
@@ -220,17 +332,6 @@
         to { opacity: 1; transform: none; }
       }
     }
-      /* Mise en page plus compacte */
-    .intro { margin: 4px 0 16px; }
-    .intro p.texte { font-size: 16px; }
-    .jeux { gap: 14px; }
-    .jeu { padding: 16px var(--pad) 16px; }
-    .jeu .type { margin-bottom: 6px; }
-    .jeu p.desc { margin: 6px 0 12px; font-size: 15px; }
-    .jeu .jouer { min-height: 50px; }
-    .jeu.challenge .logo { max-width: 220px; }
-    .jeu.zarlor .logo { width: 30%; max-width: 110px; }
-    .jeu.zarlor .zot { margin: 4px 0 0; }
   </style>
 </head>
 <body>
@@ -262,7 +363,6 @@
       <section class="jeu zarlor" id="carte-zarlor" aria-labelledby="titre-zarlor">
         <span class="type" data-t="type_zarlor">Jeu éphémère</span>
         <h2 id="titre-zarlor" style="margin:0">
-          <!-- Le logo s'affiche automatiquement dès que le fichier logo-zarlor.png existe -->
           <img class="logo" id="logo-zarlor" src="logo-zarlor.png" alt="Le Zarlor Vivant">
           <span class="titre-zarlor">Le Zarlor Vivant</span>
         </h2>
@@ -272,6 +372,43 @@
       </section>
 
     </main>
+
+    <!-- ===== MINI-JEU THÉ PÉI OU CAFÉ ===== -->
+    <section class="quiz-section" aria-labelledby="quiz-titre">
+      <span class="quiz-badge" data-t="quiz_badge">🔍 L'œil de l'expert</span>
+      <h2 id="quiz-titre" class="quiz-titre" data-t="quiz_titre">Thé péi ou Café ?</h2>
+      <p class="quiz-intro" data-t="quiz_intro">Deux fiertés de Grand-Coude... Saurez-vous les différencier à leurs feuilles ?</p>
+
+      <div class="quiz-photos">
+        <div class="quiz-vignette">
+          <span class="quiz-label">A</span>
+          <img src="plante-a.png" alt="Plante A" loading="lazy">
+        </div>
+        <div class="quiz-vignette">
+          <span class="quiz-label">B</span>
+          <img src="plante-b.png" alt="Plante B" loading="lazy">
+        </div>
+      </div>
+
+      <div class="quiz-boutons">
+        <button class="quiz-btn" onclick="jouerQuiz(true)" type="button" data-t="quiz_opt1">
+          A = Caféier &nbsp;|&nbsp; B = Théier
+        </button>
+        <button class="quiz-btn" onclick="jouerQuiz(false)" type="button" data-t="quiz_opt2">
+          A = Théier &nbsp;|&nbsp; B = Caféier
+        </button>
+      </div>
+
+      <div id="quiz-reponse" class="quiz-reponse" role="status" aria-live="polite">
+        <p id="quiz-verdict" class="quiz-reponse-titre"></p>
+        <p class="detail">
+          ☕ <strong data-t="quiz_cafe_label">Plante A = Le Caféier (Bourbon Pointu) :</strong> <span data-t="quiz_cafe_desc">Bords lisses et ondulés, feuille plus épaisse et vernissée.</span>
+        </p>
+        <p class="detail">
+          🌿 <strong data-t="quiz_the_label">Plante B = Notre Théier (Camellia sinensis) :</strong> <span data-t="quiz_the_desc">L'indice infaillible : ses bords sont finement dentelés, comme une petite scie !</span>
+        </p>
+      </div>
+    </section>
 
     <section class="avant" aria-labelledby="titre-avant">
       <h2 id="titre-avant" data-t="avant_titre">Avant d'entrer</h2>
@@ -292,6 +429,7 @@
 
   <script>
     let zarlorFerme = false;   // mis à jour d'après zarlor.json ("disponible")
+    let quizJoue = null;
 
     /* ===================== TEXTES FR / EN ===================== */
     const TEXTES = {
@@ -317,7 +455,19 @@
         st_bientot: "bientôt disponible",
         st_nonsupporte: "ce téléphone ne permet pas le mode hors ligne",
         btn: "EN 🇬🇧",
-        btn_aria: "Switch to English"
+        btn_aria: "Switch to English",
+        /* Textes Mini-Jeu */
+        quiz_badge: "🔍 L'œil de l'expert",
+        quiz_titre: "Thé péi ou Café ?",
+        quiz_intro: "Deux trésors de Grand-Coude... Saurez-vous les différencier à leurs feuilles ?",
+        quiz_opt1: "A = Caféier  |  B = Théier",
+        quiz_opt2: "A = Théier  |  B = Caféier",
+        quiz_bon: "👏 Bravo, bien vu l'expert !",
+        quiz_faux: "🌿 Presque ! La nature est pleine de nuances...",
+        quiz_cafe_label: "Plante A = Le Caféier (Bourbon Pointu) :",
+        quiz_cafe_desc: "Bords lisses et ondulés, feuille plus épaisse et vernissée.",
+        quiz_the_label: "Plante B = Notre Théier (Camellia sinensis) :",
+        quiz_the_desc: "L'indice infaillible : ses bords sont finement dentelés, comme une petite scie !"
       },
       en: {
         titre: "The Labyrinth games",
@@ -341,12 +491,35 @@
         st_bientot: "coming soon",
         st_nonsupporte: "this phone does not support offline mode",
         btn: "FR 🇫🇷",
-        btn_aria: "Passer en français"
+        btn_aria: "Passer en français",
+        /* Textes Mini-Jeu */
+        quiz_badge: "🔍 Expert's eye",
+        quiz_titre: "Local Tea or Coffee?",
+        quiz_intro: "Two treasures of Grand-Coude... Can you tell them apart by their leaves?",
+        quiz_opt1: "A = Coffee  |  B = Tea tree",
+        quiz_opt2: "A = Tea tree  |  B = Coffee",
+        quiz_bon: "👏 Well done! You have a keen eye!",
+        quiz_faux: "🌿 Almost! Nature is subtle...",
+        quiz_cafe_label: "Plant A = Coffee Tree (Bourbon Pointu):",
+        quiz_cafe_desc: "Smooth, wavy edges with a thicker, glossy leaf.",
+        quiz_the_label: "Plant B = Our Tea Tree (Camellia sinensis):",
+        quiz_the_desc: "The foolproof giveaway: finely serrated edges, like a miniature saw!"
       }
     };
 
+    /* ===================== MINI-JEU LOGIQUE ===================== */
+    function jouerQuiz(estCorrect) {
+      quizJoue = estCorrect;
+      const res = document.getElementById('quiz-reponse');
+      const v = document.getElementById('quiz-verdict');
+      const t = TEXTES[langue];
+
+      v.textContent = estCorrect ? t.quiz_bon : t.quiz_faux;
+      v.style.color = estCorrect ? 'var(--ch-vert)' : 'var(--ch-or)';
+      res.style.display = 'block';
+    }
+
     /* ===================== LANGUE ===================== */
-    // Priorité : ?lang= dans l'adresse > choix mémorisé (partagé entre les jeux) > langue du téléphone
     const CLE_LANGUE = 'labyrinthe_lang';
     function langueDepart() {
       const p = new URLSearchParams(location.search).get('lang');
@@ -369,7 +542,12 @@
       const btn = document.getElementById('btn-langue');
       btn.textContent = t.btn;
       btn.setAttribute('aria-label', t.btn_aria);
-      // Les liens transmettent la langue au jeu
+      
+      if (quizJoue !== null) {
+        const v = document.getElementById('quiz-verdict');
+        v.textContent = quizJoue ? t.quiz_bon : t.quiz_faux;
+      }
+
       document.getElementById('lien-challenge').href = '/challenge-des-experts/?lang=' + langue;
       document.getElementById('lien-zarlor').href = '/zarlor-vivant/?lang=' + langue;
       try { localStorage.setItem(CLE_LANGUE, langue); } catch (e) {}
@@ -382,7 +560,6 @@
     });
 
     /* ===================== ZARLOR : BIENTÔT DISPONIBLE ? ===================== */
-    // L'interrupteur se trouve dans zarlor.json (dépôt zarlor-vivant) : "disponible": true / false
     function appliquerOuverture() {
       const t = TEXTES[langue];
       const carte = document.getElementById('carte-zarlor');
@@ -403,7 +580,6 @@
       .catch(() => {});
 
     /* ===================== LOGO DU ZARLOR ===================== */
-    // Dès que logo-zarlor.png est déposé sur le dépôt, il remplace le titre en texte.
     const logoZ = document.getElementById('logo-zarlor');
     function logoCharge() { document.getElementById('carte-zarlor').classList.add('avec-logo'); }
     if (logoZ.complete && logoZ.naturalWidth > 0) logoCharge();
@@ -411,7 +587,6 @@
     logoZ.addEventListener('error', () => logoZ.remove());
 
     /* ===================== MODE HORS LIGNE ===================== */
-    // État de chaque jeu : 'attente' | 'ok' | 'ko' | 'indispo' | 'nonsupporte'
     const etats = { challenge: 'attente', zarlor: 'attente' };
     const NOMS = { challenge: 'Challenge des Experts', zarlor: 'Le Zarlor Vivant' };
     const ICONES = { attente: '⏳', ok: '✅', ko: '⚠️', enligne: '✅', indispo: '🕓', bientot: '🕓', nonsupporte: 'ℹ️' };
@@ -427,8 +602,6 @@
       }
     }
 
-    // Chaque jeu possède son propre fichier hors ligne (dans son dossier).
-    // Un jeu est « prêt sans réseau » si : sa page est enregistrée ET son fichier hors ligne est actif.
     const PAGES = { challenge: '/challenge-des-experts/', zarlor: '/zarlor-vivant/' };
 
     async function horsLigneActif(jeu) {
@@ -441,7 +614,7 @@
       try {
         const r = await fetch(PAGES[jeu], { method: 'HEAD', cache: 'no-store' });
         return r.ok;
-      } catch (e) { return null; } // null = pas de réseau, on ne sait pas
+      } catch (e) { return null; }
     }
 
     async function etatDe(jeu) {
@@ -460,8 +633,6 @@
       afficherStatuts();
     }
 
-    // Ouvre chaque jeu une fois, de façon invisible, pour qu'il active son propre mode hors ligne
-    // pendant que le visiteur est encore à l'entrée (là où il y a du réseau).
     async function preparerJeux() {
       for (const jeu of ['challenge', 'zarlor']) {
         if (etats[jeu] !== 'enligne') continue;
@@ -481,9 +652,7 @@
         .then(verifierCache)
         .then(preparerJeux)
         .catch(verifierCache);
-      // Revérifie quand le réseau revient
       window.addEventListener('online', () => setTimeout(verifierCache, 1500));
-      // Le service worker prévient quand l'enregistrement est terminé
       navigator.serviceWorker.addEventListener('message', ev => {
         if (ev.data && ev.data.type === 'precache-termine') verifierCache();
       });
