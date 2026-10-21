@@ -7,23 +7,19 @@
   <title>Les jeux du Labyrinthe – Labyrinthe En Champ-Thé</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Plus Jakarta Sans = police du Challenge ; Chewy = titre provisoire du Zarlor -->
   <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <style>
     /* ===== Couleurs ===== */
     :root {
-      /* Challenge des Experts (charte existante) */
       --ch-vert: #1E3F20;
       --ch-vert-fonce: #122613;
       --ch-or: #C59B27;
       --ch-bois: #D1C7B7;
-      /* Le Zarlor Vivant (charte des pancartes) */
       --zv-jaune: #FFD84D;
       --zv-jaune-pale: #FFF3C2;
       --zv-vert: #2F5E2A;
       --zv-feuille: #4A9347;
-      /* Commun */
       --fond: #F7F5F0;
       --texte: #18231C;
       --texte-doux: #4F5E53;
@@ -161,7 +157,7 @@
     .jeu.zarlor.bientot .jouer { background: #E9E5D8; color: #5C6B60; cursor: default; }
     .jeu.zarlor.bientot .type { background: var(--ch-or); color: var(--blanc); }
 
-    /* ===== Mini-Jeu : Thé ou Café ===== */
+    /* ===== Mini-Jeu : Thé péi ou Café ===== */
     .quiz-section {
       margin-top: 24px;
       background: var(--blanc);
@@ -188,8 +184,9 @@
     }
     .quiz-intro {
       margin: 0 0 16px;
-      font-size: 14px;
-      color: var(--texte-doux);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--texte);
     }
     .quiz-photos {
       display: grid;
@@ -232,42 +229,55 @@
     }
     .quiz-boutons {
       display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
     .quiz-btn {
-      min-height: 44px;
+      min-height: 48px;
       padding: 10px 14px;
       border-radius: 12px;
       border: 2px solid var(--ch-bois);
       background: var(--fond);
       color: var(--ch-vert-fonce);
       font-family: inherit;
-      font-weight: 700;
-      font-size: 15px;
+      font-weight: 800;
+      font-size: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s;
     }
-    .quiz-btn:active { transform: scale(0.98); }
+    .quiz-btn:active { transform: scale(0.97); }
     .quiz-btn:hover {
       background: #EFECE6;
-      border-color: var(--ch-or);
+      border-color: var(--ch-vert);
     }
     .quiz-reponse {
       display: none;
       margin-top: 14px;
       padding: 14px;
       border-radius: 12px;
-      background: #F4F8F3;
-      border: 1px solid #D6EED9;
       font-size: 14px;
       line-height: 1.45;
     }
+    .quiz-reponse.correct {
+      background: #F4F8F3;
+      border: 2px solid #2F5E2A;
+    }
+    .quiz-reponse.correct .quiz-reponse-titre {
+      color: #1E3F20;
+    }
+    .quiz-reponse.incorrect {
+      background: #FDF4F4;
+      border: 2px solid #C53030;
+    }
+    .quiz-reponse.incorrect .quiz-reponse-titre {
+      color: #C53030;
+    }
     .quiz-reponse-titre {
       font-weight: 800;
-      font-size: 15px;
+      font-size: 16px;
       margin: 0 0 8px;
     }
     .quiz-reponse p { margin: 6px 0; }
@@ -317,7 +327,7 @@
     }
     footer a { color: var(--ch-vert); font-weight: 700; }
 
-    /* Focus visible au clavier */
+    /* Focus visible */
     a:focus-visible, button:focus-visible {
       outline: 3px solid var(--ch-or);
       outline-offset: 3px;
@@ -373,43 +383,46 @@
 
     </main>
 
-    <!-- ===== MINI-JEU THÉ PÉI OU CAFÉ ===== -->
+    <!-- ===== MINI-JEU THÉ OU CAFÉ ===== -->
     <section class="quiz-section" aria-labelledby="quiz-titre">
       <span class="quiz-badge" data-t="quiz_badge">🔍 L'œil de l'expert</span>
       <h2 id="quiz-titre" class="quiz-titre" data-t="quiz_titre">Thé péi ou Café ?</h2>
-      <p class="quiz-intro" data-t="quiz_intro">Deux fiertés de Grand-Coude... Saurez-vous les différencier à leurs feuilles ?</p>
+      <p class="quiz-intro" data-t="quiz_intro">D'après vous, quelle est la feuille de thé ?</p>
 
       <div class="quiz-photos">
         <div class="quiz-vignette">
           <span class="quiz-label">A</span>
-          <img src="plante-a.png" alt="Plante A" loading="lazy">
+          <img src="plante-a.png" alt="Feuille A" loading="lazy">
         </div>
         <div class="quiz-vignette">
           <span class="quiz-label">B</span>
-          <img src="plante-b.png" alt="Plante B" loading="lazy">
+          <img src="plante-b.png" alt="Feuille B" loading="lazy">
         </div>
       </div>
 
       <div class="quiz-boutons">
-        <button class="quiz-btn" onclick="jouerQuiz(true)" type="button" data-t="quiz_opt1">
-          A = Caféier &nbsp;|&nbsp; B = Théier
+        <button class="quiz-btn" onclick="jouerQuiz('A')" type="button" data-t="quiz_btn_a">
+          Feuille A
         </button>
-        <button class="quiz-btn" onclick="jouerQuiz(false)" type="button" data-t="quiz_opt2">
-          A = Théier &nbsp;|&nbsp; B = Caféier
+        <button class="quiz-btn" onclick="jouerQuiz('B')" type="button" data-t="quiz_btn_b">
+          Feuille B
         </button>
       </div>
 
       <div id="quiz-reponse" class="quiz-reponse" role="status" aria-live="polite">
         <p id="quiz-verdict" class="quiz-reponse-titre"></p>
         <p class="detail">
-          ☕ <strong data-t="quiz_cafe_label">Plante A = Le Caféier (Bourbon Pointu) :</strong> <span data-t="quiz_cafe_desc">Bords lisses et ondulés, feuille plus épaisse et vernissée.</span>
+          🌿 <strong data-t="quiz_the_label">Plante B = NOTRE THÉIER (Camellia sinensis) !</strong><br>
+          <span data-t="quiz_the_desc">L’indice qui ne trompe jamais : le bord de la feuille est finement dentelé, comme une petite scie. C’est ce feuillage délicat qui fait toute l'identité de nos parcelles et donne nos arômes uniques en tasse.</span>
         </p>
-        <p class="detail">
-          🌿 <strong data-t="quiz_the_label">Plante B = Notre Théier (Camellia sinensis) :</strong> <span data-t="quiz_the_desc">L'indice infaillible : ses bords sont finement dentelés, comme une petite scie !</span>
+        <p class="detail" style="margin-top: 10px;">
+          ☕ <strong data-t="quiz_cafe_label">Plante A = Le Caféier (Bourbon Pointu) :</strong><br>
+          <span data-t="quiz_cafe_desc">Sa feuille se distingue nettement : ses bords sont lisses et ondulés, et sa surface est plus épaisse et vernissée.</span>
         </p>
       </div>
     </section>
 
+    <!-- ===== Avant d'entrer ===== -->
     <section class="avant" aria-labelledby="titre-avant">
       <h2 id="titre-avant" data-t="avant_titre">Avant d'entrer</h2>
       <ul class="statuts" aria-live="polite">
@@ -429,7 +442,7 @@
 
   <script>
     let zarlorFerme = false;   // mis à jour d'après zarlor.json ("disponible")
-    let quizJoue = null;
+    let reponseChoisie = null;
 
     /* ===================== TEXTES FR / EN ===================== */
     const TEXTES = {
@@ -459,15 +472,15 @@
         /* Textes Mini-Jeu */
         quiz_badge: "🔍 L'œil de l'expert",
         quiz_titre: "Thé péi ou Café ?",
-        quiz_intro: "Deux trésors de Grand-Coude... Saurez-vous les différencier à leurs feuilles ?",
-        quiz_opt1: "A = Caféier  |  B = Théier",
-        quiz_opt2: "A = Théier  |  B = Caféier",
-        quiz_bon: "👏 Bravo, bien vu l'expert !",
-        quiz_faux: "🌿 Presque ! La nature est pleine de nuances...",
+        quiz_intro: "D'après vous, quelle est la feuille de thé ?",
+        quiz_btn_a: "Feuille A",
+        quiz_btn_b: "Feuille B",
+        quiz_bon: "✅ Bravo, bonne réponse !",
+        quiz_faux: "❌ Mauvaise réponse !",
+        quiz_the_label: "Plante B = NOTRE THÉIER (Camellia sinensis) !",
+        quiz_the_desc: "L’indice qui ne trompe jamais : le bord de la feuille est finement dentelé, comme une petite scie. C’est ce feuillage délicat qui fait toute l'identité de nos parcelles et donne nos arômes uniques en tasse.",
         quiz_cafe_label: "Plante A = Le Caféier (Bourbon Pointu) :",
-        quiz_cafe_desc: "Bords lisses et ondulés, feuille plus épaisse et vernissée.",
-        quiz_the_label: "Plante B = Notre Théier (Camellia sinensis) :",
-        quiz_the_desc: "L'indice infaillible : ses bords sont finement dentelés, comme une petite scie !"
+        quiz_cafe_desc: "Sa feuille se distingue nettement : ses bords sont lisses et ondulés, et sa surface est plus épaisse et vernissée."
       },
       en: {
         titre: "The Labyrinth games",
@@ -495,31 +508,32 @@
         /* Textes Mini-Jeu */
         quiz_badge: "🔍 Expert's eye",
         quiz_titre: "Local Tea or Coffee?",
-        quiz_intro: "Two treasures of Grand-Coude... Can you tell them apart by their leaves?",
-        quiz_opt1: "A = Coffee  |  B = Tea tree",
-        quiz_opt2: "A = Tea tree  |  B = Coffee",
-        quiz_bon: "👏 Well done! You have a keen eye!",
-        quiz_faux: "🌿 Almost! Nature is subtle...",
+        quiz_intro: "In your opinion, which one is the tea leaf?",
+        quiz_btn_a: "Leaf A",
+        quiz_btn_b: "Leaf B",
+        quiz_bon: "✅ Well done, correct answer!",
+        quiz_faux: "❌ Wrong answer!",
+        quiz_the_label: "Plant B = OUR TEA TREE (Camellia sinensis)!",
+        quiz_the_desc: "The foolproof giveaway: finely serrated edges, like a miniature saw! This delicate foliage gives our tea its unique character and taste.",
         quiz_cafe_label: "Plant A = Coffee Tree (Bourbon Pointu):",
-        quiz_cafe_desc: "Smooth, wavy edges with a thicker, glossy leaf.",
-        quiz_the_label: "Plant B = Our Tea Tree (Camellia sinensis):",
-        quiz_the_desc: "The foolproof giveaway: finely serrated edges, like a miniature saw!"
+        quiz_cafe_desc: "Its leaves stand out clearly: smooth, wavy edges with a thicker, glossy texture."
       }
     };
 
-    /* ===================== MINI-JEU LOGIQUE ===================== */
-    function jouerQuiz(estCorrect) {
-      quizJoue = estCorrect;
+    /* ===================== LOGIQUE DU MINI-JEU ===================== */
+    function jouerQuiz(choix) {
+      reponseChoisie = choix;
       const res = document.getElementById('quiz-reponse');
       const v = document.getElementById('quiz-verdict');
       const t = TEXTES[langue];
+      const estCorrect = (choix === 'B');
 
+      res.className = 'quiz-reponse ' + (estCorrect ? 'correct' : 'incorrect');
       v.textContent = estCorrect ? t.quiz_bon : t.quiz_faux;
-      v.style.color = estCorrect ? 'var(--ch-vert)' : 'var(--ch-or)';
       res.style.display = 'block';
     }
 
-    /* ===================== LANGUE ===================== */
+    /* ===================== GESTION DE LA LANGUE ===================== */
     const CLE_LANGUE = 'labyrinthe_lang';
     function langueDepart() {
       const p = new URLSearchParams(location.search).get('lang');
@@ -543,9 +557,8 @@
       btn.textContent = t.btn;
       btn.setAttribute('aria-label', t.btn_aria);
       
-      if (quizJoue !== null) {
-        const v = document.getElementById('quiz-verdict');
-        v.textContent = quizJoue ? t.quiz_bon : t.quiz_faux;
+      if (reponseChoisie !== null) {
+        jouerQuiz(reponseChoisie);
       }
 
       document.getElementById('lien-challenge').href = '/challenge-des-experts/?lang=' + langue;
@@ -559,7 +572,7 @@
       appliquerLangue();
     });
 
-    /* ===================== ZARLOR : BIENTÔT DISPONIBLE ? ===================== */
+    /* ===================== ZARLOR : DISPONIBILITÉ ===================== */
     function appliquerOuverture() {
       const t = TEXTES[langue];
       const carte = document.getElementById('carte-zarlor');
