@@ -54,18 +54,25 @@
     .barre {
       display: flex;
       justify-content: flex-end;
+      gap: 6px;
     }
     .btn-langue {
       font: inherit;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14px;
       min-height: 44px;
-      padding: 0 16px;
+      padding: 0 12px;
       border-radius: 999px;
       border: 2px solid var(--ch-bois);
       background: var(--blanc);
       color: var(--ch-vert);
       cursor: pointer;
+    }
+    .btn-langue[aria-pressed="true"] {
+      background: var(--ch-vert);
+      border-color: var(--ch-vert);
+      color: var(--blanc);
+      cursor: default;
     }
 
     .intro { margin: 4px 0 16px; }
@@ -88,6 +95,16 @@
       font-size: 16px;
       color: var(--texte-doux);
     }
+    .intro .note-langue {
+      margin: 12px 0 0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: #EFE6CF;
+      color: #6B5414;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .intro .note-langue[hidden] { display: none; }
 
     /* ===== Cartes des jeux ===== */
     .jeux { display: grid; gap: 14px; }
@@ -410,14 +427,17 @@
 <body>
   <div class="page">
 
-    <div class="barre">
-      <button class="btn-langue" id="btn-langue" type="button" aria-label="Switch to English">EN 🇬🇧</button>
+    <div class="barre" role="group" aria-label="Langue / Language / Sprache">
+      <button class="btn-langue" type="button" data-lang="fr" lang="fr" aria-label="Passer en français">FR 🇫🇷</button>
+      <button class="btn-langue" type="button" data-lang="en" lang="en" aria-label="Switch to English">EN 🇬🇧</button>
+      <button class="btn-langue" type="button" data-lang="de" lang="de" aria-label="Auf Deutsch wechseln">DE 🇩🇪</button>
     </div>
 
     <header class="intro">
       <h1 data-t="titre">Les jeux du Labyrinthe</h1>
       <p class="lieu">Labyrinthe En Champ-Thé, Grand-Coude</p>
       <p class="texte" data-t="intro">Deux jeux à faire en même temps, au fil de votre balade. Scannez les pancartes dans l'ordre de votre choix et passez d'un jeu à l'autre quand vous voulez&nbsp;: chaque jeu garde votre progression.</p>
+      <p class="note-langue" id="note-langue" hidden></p>
     </header>
 
     <main class="jeux">
@@ -485,11 +505,19 @@
   <script>
     let zarlorFerme = false;
 
-    /* ===================== TEXTES FR / EN DU HUB ===================== */
+    /* ===================== LANGUES ===================== */
+    const LANGUES = ['fr', 'en', 'de'];
+    /* Langues dans lesquelles les JEUX eux-mêmes existent.
+       Si une langue de cette page n'existe pas encore dans les jeux,
+       le visiteur est envoyé vers la version anglaise des jeux. */
+    const LANGUES_JEUX = ['fr', 'en', 'de'];
+
+    /* ===================== TEXTES FR / EN / DE DU HUB ===================== */
     const TEXTES = {
       fr: {
         titre: "Les jeux du Labyrinthe",
         intro: "Deux jeux à faire en même temps, au fil de votre balade. Scannez les pancartes dans l'ordre de votre choix et passez d'un jeu à l'autre quand vous voulez\u00a0: chaque jeu garde votre progression.",
+        note_langue: "",
         type_challenge: "Jeu permanent",
         desc_challenge: "L'histoire du thé et de Grand-Coude en 17 pancartes. Répondez aux questions et décodez les mots mystères.",
         jouer_challenge: "Jouer au Challenge",
@@ -507,13 +535,12 @@
         st_indispo: "pas encore en ligne",
         st_enligne: "disponible (nécessite du réseau)",
         st_bientot: "bientôt disponible",
-        st_nonsupporte: "ce téléphone ne permet pas le mode hors ligne",
-        btn: "EN 🇬🇧",
-        btn_aria: "Switch to English"
+        st_nonsupporte: "ce téléphone ne permet pas le mode hors ligne"
       },
       en: {
         titre: "The Labyrinth games",
         intro: "Two games to play at the same time as you stroll. Scan the signs in any order and switch from one game to the other whenever you like: each game keeps your progress.",
+        note_langue: "",
         type_challenge: "Permanent game",
         desc_challenge: "The story of tea and Grand-Coude in 17 signs. Answer the questions and decode the mystery words.",
         jouer_challenge: "Play the Challenge",
@@ -531,9 +558,30 @@
         st_indispo: "not online yet",
         st_enligne: "available (needs a network connection)",
         st_bientot: "coming soon",
-        st_nonsupporte: "this phone does not support offline mode",
-        btn: "FR 🇫🇷",
-        btn_aria: "Passer en français"
+        st_nonsupporte: "this phone does not support offline mode"
+      },
+      de: {
+        titre: "Die Spiele im Labyrinth",
+        intro: "Zwei Spiele, die Sie gleichzeitig während Ihres Spaziergangs spielen können. Scannen Sie die Schilder in beliebiger Reihenfolge und wechseln Sie jederzeit zwischen den Spielen: Ihr Fortschritt bleibt in jedem Spiel gespeichert.",
+        note_langue: "",
+        type_challenge: "Dauerhaftes Spiel",
+        desc_challenge: "Die Geschichte des Tees und von Grand-Coude auf 17 Schildern. Beantworten Sie die Fragen und entschlüsseln Sie die geheimen Wörter.",
+        jouer_challenge: "Challenge spielen",
+        type_zarlor: "Zeitlich begrenztes Spiel",
+        desc_zarlor: "Entdecken Sie die lebendigen Schätze von La Réunion: bedrohte endemische Tier- und Pflanzenarten sowie traditionelle \u201eLontan\u201c-Obst- und Gemüsesorten. 17 Schilder, 17 Arten zum Entdecken.",
+        jouer_zarlor: "Zarlor spielen",
+        bientot_badge: "Demnächst verfügbar",
+        bientot_bouton: "Demnächst verfügbar",
+        avant_titre: "Bevor Sie losgehen",
+        conseil_reseau: "Im Wald ist der Empfang schwach: Lassen Sie diese Seite hier einige Sekunden geöffnet, damit die Spiele auf Ihrem Handy gespeichert werden.",
+        conseil_scan: "Um ein Schild zu scannen, nutzen Sie die Scan-Schaltfläche im Spiel statt der Kamera-App.",
+        st_attente: "wird vorbereitet…",
+        st_ok: "bereit, auch ohne Empfang",
+        st_ko: "noch nicht gespeichert (Empfang zu schwach?)",
+        st_indispo: "noch nicht online",
+        st_enligne: "verfügbar (Internetverbindung nötig)",
+        st_bientot: "demnächst verfügbar",
+        st_nonsupporte: "dieses Handy unterstützt den Offline-Modus nicht"
       }
     };
 
@@ -556,11 +604,14 @@
           openPage: "Ouvrir cette page →",
           isCurrent: "← ouverte sur la page",
           notBefore: "Pas avant ",
+          excl: "\u00a0!",
           postmarkText: "À OUVRIR · GRAND-COUDE · ",
           titlePage: "Page de garde",
+          moisTitre: "Novembre 2026",
           gardeBig: "Ce carnet se remplit<br>au fil de novembre…",
           gardeText: "Chaque mercredi, une création de nos jardins vous attend en dégustation au comptoir. Chaque lundi, une nouvelle page s'écrit ici avec son histoire. En attendant, lisez bien ce qui est griffonné sur les enveloppes : saurez-vous deviner leur contenu ?",
-          firstPage: "Première page : "
+          firstPage: "Première page : ",
+          sirop: "sirop"
         },
         en: {
           eyebrow: "Field Notes · November 2026",
@@ -575,11 +626,36 @@
           openPage: "Open this page →",
           isCurrent: "← open on page",
           notBefore: "Not before ",
+          excl: "!",
           postmarkText: "TO OPEN · GRAND-COUDE · ",
           titlePage: "Title Page",
+          moisTitre: "November 2026",
           gardeBig: "This journal reveals itself<br>throughout November…",
           gardeText: "Every Wednesday, a unique creation from our gardens awaits you for a complimentary tasting. Each Monday, a new page unfolds with its story. In the meantime, read the clues scribbled on the envelopes: can you guess what's inside?",
-          firstPage: "First page: "
+          firstPage: "First page: ",
+          sirop: "syrup"
+        },
+        de: {
+          eyebrow: "Feldnotizen · November 2026",
+          title: "Mittwochs im Labyrinth",
+          subtitle: "— Verkostungsheft",
+          coverNote: "Jeden Mittwoch im November: eine kostenlose grüne Auszeit in Grand-Coude.",
+          seal: "ZUR VERKOSTUNG · DIESE WOCHE ·",
+          offert: "Kostenlose Verkostung an der Theke",
+          somTitle: "Die Stationen",
+          somSub: "Jede Seite öffnet sich am Montag vor der jeweiligen Verkostung.",
+          escaleNum: "Station Nr. ",
+          openPage: "Diese Seite öffnen →",
+          isCurrent: "← gerade aufgeschlagen",
+          notBefore: "Nicht vor ",
+          excl: "!",
+          postmarkText: "ZU ÖFFNEN · GRAND-COUDE · ",
+          titlePage: "Titelseite",
+          moisTitre: "November 2026",
+          gardeBig: "Dieses Heft füllt sich<br>im Laufe des Novembers…",
+          gardeText: "Jeden Mittwoch wartet eine Kreation aus unseren Gärten an der Theke zur Verkostung auf Sie. Jeden Montag entsteht hier eine neue Seite mit ihrer Geschichte. Lesen Sie bis dahin aufmerksam, was auf die Umschläge gekritzelt ist: Können Sie erraten, was darin steckt?",
+          firstPage: "Erste Seite: ",
+          sirop: "Sirup"
         }
       };
 
@@ -587,78 +663,87 @@
       const ART = {
         citronnelle: `<svg viewBox="40 0 220 196" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Thé blanc et citronnelle"><rect x="0" y="0" width="300" height="200" fill="#EDF0E3"/><circle cx="150" cy="104" r="86" fill="#E3E9D5"/><g stroke-linecap="round"><path d="M226 196 C 214 150 188 92 150 18" fill="none" stroke="#7E9A4A" stroke-width="7"/><path d="M226 196 C 214 150 188 92 150 18" fill="none" stroke="#B5C984" stroke-width="3.5"/><path d="M234 196 C 230 140 236 80 262 10" fill="none" stroke="#6F8C3E" stroke-width="5"/><path d="M230 196 C 220 150 210 110 196 60 C 192 46 186 36 180 30" fill="none" stroke="#8AA556" stroke-width="5"/></g><path d="M70 188 C 84 150 96 118 108 80 C 114 62 118 48 120 34" fill="none" stroke="#7A6A4E" stroke-width="2.4" stroke-linecap="round"/>${feuille(96, 112, -152, 1.1, "#C6D3B2")}${feuille(110, 76, -20, 1, "#D2DDBF")}<g transform="translate(120 34) rotate(-8)"><path d="M0 2 C -9 -8 -8 -30 0 -44 C 8 -30 9 -8 0 2 Z" fill="#F1F2EC" stroke="#8E9C8A" stroke-width="1.2"/></g></svg>`,
         curcuma: `<svg viewBox="40 0 220 196" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Curcuma et thé vert"><rect x="0" y="0" width="300" height="200" fill="#FBF1DC"/><circle cx="144" cy="100" r="86" fill="#F5E4BF"/>${feuille(70, 70, -35, 1, "#BFD2A6")}${feuille(196, 52, 20, .85, "#CBDBB4")}<g stroke="#8A5A1E" stroke-width="1.5" stroke-linejoin="round"><path d="M78 150 C 70 132 92 118 112 124 C 126 112 152 114 162 128 C 182 122 204 132 200 150 C 196 166 172 168 158 160 C 140 172 112 172 100 162 C 88 166 82 160 78 150 Z" fill="#C98A3A"/><path d="M112 124 C 108 108 118 96 128 100 M162 128 C 168 112 182 108 188 116" fill="none"/></g><g transform="translate(222 150)"><circle r="20" fill="#E8902A" stroke="#8A5A1E" stroke-width="1.5"/><circle r="13" fill="#F2A93B"/></g></svg>`,
-        sirop: isEnglish => `<svg viewBox="40 0 220 196" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sirop de thé vert"><rect x="0" y="0" width="300" height="200" fill="#E6F0E8"/><circle cx="144" cy="100" r="86" fill="#DCEBDF"/>${feuille(178, 150, -60, .9, "#BFD2A6")}${feuille(60, 130, -110, .9, "#CBDBB4")}<g stroke="#2F4B3A" stroke-width="1.6" stroke-linejoin="round"><path d="M128 34 H160 V54 C160 60 176 66 176 84 V176 C176 182 172 186 166 186 H122 C116 186 112 182 112 176 V84 C112 66 128 60 128 54 Z" fill="#FFFDF8" fill-opacity=".7"/><path d="M114 100 H174 V176 C174 181 170 184 165 184 H123 C118 184 114 181 114 176 Z" fill="#8A5326" stroke="none"/><path d="M126 28 H162 V38 H126 Z" fill="#9A5418"/><rect x="120" y="118" width="48" height="36" rx="4" fill="#FAF7F2"/></g><text x="144" y="141" text-anchor="middle" font-family="Caveat, cursive" font-size="16" font-weight="600" fill="#1D3326">${isEnglish ? "syrup" : "sirop"}</text></svg>`,
+        sirop: label => `<svg viewBox="40 0 220 196" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sirop de thé vert"><rect x="0" y="0" width="300" height="200" fill="#E6F0E8"/><circle cx="144" cy="100" r="86" fill="#DCEBDF"/>${feuille(178, 150, -60, .9, "#BFD2A6")}${feuille(60, 130, -110, .9, "#CBDBB4")}<g stroke="#2F4B3A" stroke-width="1.6" stroke-linejoin="round"><path d="M128 34 H160 V54 C160 60 176 66 176 84 V176 C176 182 172 186 166 186 H122 C116 186 112 182 112 176 V84 C112 66 128 60 128 54 Z" fill="#FFFDF8" fill-opacity=".7"/><path d="M114 100 H174 V176 C174 181 170 184 165 184 H123 C118 184 114 181 114 176 Z" fill="#8A5326" stroke="none"/><path d="M126 28 H162 V38 H126 Z" fill="#9A5418"/><rect x="120" y="118" width="48" height="36" rx="4" fill="#FAF7F2"/></g><text x="144" y="141" text-anchor="middle" font-family="Caveat, cursive" font-size="16" font-weight="600" fill="#1D3326">${label}</text></svg>`,
         piment: `<svg viewBox="40 0 220 196" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Thé vert piment infusé à froid"><rect x="0" y="0" width="300" height="200" fill="#F8E6DE"/><circle cx="144" cy="100" r="86" fill="#F4DDD3"/><g stroke="#2F4B3A" stroke-width="1.6" stroke-linejoin="round"><path d="M104 40 H184 L174 182 C174 186 170 188 166 188 H122 C118 188 114 186 114 182 Z" fill="#FFFDF8" fill-opacity=".6"/><path d="M108 78 H180 L173 180 C173 184 170 186 166 186 H122 C118 186 115 184 115 180 Z" fill="#C9D38A" stroke="none"/><rect x="122" y="90" width="22" height="22" rx="4" transform="rotate(-12 133 101)" fill="#FFFFFF" fill-opacity=".75"/><rect x="148" y="106" width="20" height="20" rx="4" transform="rotate(14 158 116)" fill="#FFFFFF" fill-opacity=".75"/></g>${feuille(150, 72, -70, .7, "#BFD2A6")}<g stroke="#7A2A18" stroke-width="1.4" stroke-linejoin="round"><path d="M200 150 C 214 130 236 124 252 128 C 244 140 228 156 204 160 Z" fill="#C8432B"/><path d="M44 120 C 58 104 78 100 92 104 C 84 116 70 128 48 130 Z" fill="#D9573A"/></g></svg>`
       };
 
       const ESCALES_DATA = [
         {
           mercrediDate: "2026-11-04", acc: "#6E8A3E", tape: "rgba(150,180,90,.55)", fond: "#EDF0E3",
-          nom: { fr: "Thé Blanc & Citronnelle", en: "White Tea & Lemongrass" },
-          signature: { fr: "L'Éveil Frais des Sommets", en: "A Fresh Highland Awakening" },
+          nom: { fr: "Thé Blanc & Citronnelle", en: "White Tea & Lemongrass", de: "Weißer Tee & Zitronengras" },
+          signature: { fr: "L'Éveil Frais des Sommets", en: "A Fresh Highland Awakening", de: "Frisches Erwachen aus den Höhen" },
           histoire: {
             fr: "Incontournable et pilier des jardins créoles, la citronnelle s'associe à la délicatesse de notre thé blanc. Simple, délicate et idéale après un repas, c'est une véritable pause douceur et authenticité.",
-            en: "A staple of Creole gardens, lemongrass pairs beautifully with the subtlety of our white tea. Simple, delicate, and ideal after a meal, it offers a moment of pure comfort and authenticity."
+            en: "A staple of Creole gardens, lemongrass pairs beautifully with the subtlety of our white tea. Simple, delicate, and ideal after a meal, it offers a moment of pure comfort and authenticity.",
+            de: "Zitronengras ist aus den kreolischen Gärten nicht wegzudenken und verbindet sich hier mit der Feinheit unseres weißen Tees. Schlicht, zart und ideal nach dem Essen – ein echter Moment der Ruhe und Ursprünglichkeit."
           },
-          annotations: { fr: [], en: [] },
-          note: { fr: "", en: "" },
+          annotations: { fr: [], en: [], de: [] },
+          note: { fr: "", en: "", de: "" },
           indice: {
             fr: "L'essence d'un pilier de nos jardins créoles mariée à la plus pure délicatesse du théier...",
-            en: "The essence of our Creole gardens blended with the finest leaves of the tea garden..."
+            en: "The essence of our Creole gardens blended with the finest leaves of the tea garden...",
+            de: "Das Herzstück unserer kreolischen Gärten, vereint mit der zartesten Seite des Teestrauchs..."
           },
           artKey: "citronnelle", photo: "https://enchampthe.com/wp-content/uploads/2026/10/Green-and-Beige-Vintage-Scrapbook-Travel-Journal-Cover-A4-Document.png",
           cadrage: "50% 62%"
         },
         {
           mercrediDate: "2026-11-11", acc: "#B67A16", tape: "rgba(227,167,47,.55)", fond: "#FBF1DC",
-          nom: { fr: "Thé Vert & Curcuma", en: "Green Tea & Turmeric" },
-          signature: { fr: "Entre force volcanique et douceur végétale", en: "Between volcanic strength and botanical gentleness" },
+          nom: { fr: "Thé Vert & Curcuma", en: "Green Tea & Turmeric", de: "Grüner Tee & Kurkuma" },
+          signature: { fr: "Entre force volcanique et douceur végétale", en: "Between volcanic strength and botanical gentleness", de: "Zwischen vulkanischer Kraft und pflanzlicher Sanftheit" },
           histoire: {
             fr: "Ce thé rappelle l'explosivité du volcan et la douceur de notre thé vert. Il met à l'honneur notre curcuma péi — surnommé « safran péi » —, reconnu pour sa qualité exceptionnelle.",
-            en: "This tea balances volcanic intensity with the gentleness of our green tea. It honors our local turmeric — known here as 'safran péi' — prized for its remarkable quality."
+            en: "This tea balances volcanic intensity with the gentleness of our green tea. It honors our local turmeric — known here as 'safran péi' — prized for its remarkable quality.",
+            de: "Dieser Tee erinnert an die Wucht des Vulkans und die Sanftheit unseres grünen Tees. Im Mittelpunkt steht unsere einheimische Kurkuma – hier \u201eSafran péi\u201c genannt –, die für ihre außergewöhnliche Qualität bekannt ist."
           },
-          annotations: { fr: [], en: [] },
-          note: { fr: "En ce moment : retrouvez-nous à la Fête du Curcuma !", en: "Happening now: come meet us at the Turmeric Festival!" },
+          annotations: { fr: [], en: [], de: [] },
+          note: { fr: "En ce moment : retrouvez-nous à la Fête du Curcuma !", en: "Happening now: come meet us at the Turmeric Festival!", de: "Aktuell: Besuchen Sie uns beim Kurkumafest (Fête du Curcuma)!" },
           indice: {
             fr: "L'or jaune de Saint-Joseph se mêle à nos théiers...",
-            en: "Saint-Joseph's golden spice meets our tea plants..."
+            en: "Saint-Joseph's golden spice meets our tea plants...",
+            de: "Das gelbe Gold von Saint-Joseph trifft auf unsere Teesträucher..."
           },
           artKey: "curcuma", photo: "https://enchampthe.com/wp-content/uploads/2026/10/IMG_20210914_144249-scaled.jpg",
           cadrage: "50% 55%"
         },
         {
           mercrediDate: "2026-11-18", acc: "#7A4A22", tape: "rgba(166,112,60,.5)", fond: "#F3E6D6",
-          nom: { fr: "Sirop de Thé Vert", en: "Green Tea Syrup" },
-          signature: { fr: "La touche d'originalité pour toute la famille", en: "A fresh twist for the whole family" },
+          nom: { fr: "Sirop de Thé Vert", en: "Green Tea Syrup", de: "Grüntee-Sirup" },
+          signature: { fr: "La touche d'originalité pour toute la famille", en: "A fresh twist for the whole family", de: "Ein origineller Genuss für die ganze Familie" },
           histoire: {
             fr: "L'été arrive ! C'est le moment idéal pour se rafraîchir avec originalité. Une création gourmande qui saura séduire les petits comme les grands.",
-            en: "Summer is coming! The ideal time to cool down with something genuinely original. A delicious creation sure to delight kids and adults alike."
+            en: "Summer is coming! The ideal time to cool down with something genuinely original. A delicious creation sure to delight kids and adults alike.",
+            de: "Auf La Réunion beginnt der Sommer! Die perfekte Zeit für eine originelle Erfrischung. Eine köstliche Kreation, die Klein und Groß begeistert."
           },
           annotations: {
             fr: ["<b>À boire →</b> allongé d'eau fraîche ou pétillante", "<b>En coulis →</b> sur une glace, des crêpes, une salade de fruits péi"],
-            en: ["<b>To drink →</b> with chilled still or sparkling water", "<b>As a drizzle →</b> over ice cream, pancakes, or local fruit bowls"]
+            en: ["<b>To drink →</b> with chilled still or sparkling water", "<b>As a drizzle →</b> over ice cream, pancakes, or local fruit bowls"],
+            de: ["<b>Zum Trinken →</b> mit kaltem stillem oder sprudelndem Wasser verdünnt", "<b>Als Topping →</b> über Eis, Crêpes oder einem Salat aus einheimischen Früchten"]
           },
-          note: { fr: "Les marmailles adorent !", en: "Kids absolutely love it!" },
+          note: { fr: "Les marmailles adorent !", en: "Kids absolutely love it!", de: "Kinder lieben ihn!" },
           indice: {
             fr: "Une douceur ambrée et sirupeuse pour sublimer la table...",
-            en: "A rich, amber sweetness to elevate the table..."
+            en: "A rich, amber sweetness to elevate the table...",
+            de: "Eine bernsteinfarbene, sirupartige Süße, die jeden Tisch verfeinert..."
           },
           artKey: "sirop", photo: "https://enchampthe.com/wp-content/uploads/2026/10/1000026079-scaled.jpg",
           cadrage: "50% 80%"
         },
         {
           mercrediDate: "2026-11-25", acc: "#A83E2B", tape: "rgba(210,85,58,.45)", fond: "#F8E6DE",
-          nom: { fr: "Thé Vert Piment – Infusé à Froid", en: "Chili Green Tea – Cold Brew" },
-          signature: { fr: "Une alliance audacieuse, fraîche et piquante", en: "A daring pairing: chilled and fiery" },
+          nom: { fr: "Thé Vert Piment – Infusé à Froid", en: "Chili Green Tea – Cold Brew", de: "Grüner Tee mit Chili – kalt aufgegossen" },
+          signature: { fr: "Une alliance audacieuse, fraîche et piquante", en: "A daring pairing: chilled and fiery", de: "Eine kühne Verbindung: frisch und scharf" },
           histoire: {
             fr: "Oui, il est aussi possible d'apprécier son thé infusé à froid pour en exploiter tout le potentiel ! La fraîcheur végétale du thé vert rencontre le caractère du piment péi dans une préparation cold brew.",
-            en: "Yes, cold brewing opens up a completely new character in tea! The fresh botanical green tea meets the punch of local chili in a crisp cold brew."
+            en: "Yes, cold brewing opens up a completely new character in tea! The fresh botanical green tea meets the punch of local chili in a crisp cold brew.",
+            de: "Ja, Tee lässt sich auch kalt aufgießen – und zeigt dabei sein volles Potenzial! Die pflanzliche Frische des grünen Tees trifft in einem Cold Brew auf den Charakter des einheimischen Chilis."
           },
-          annotations: { fr: [], en: [] },
-          note: { fr: "Notre conseil : avec un bon riz chauffé !", en: "Our tip: best paired with hot sautéed rice!" },
+          annotations: { fr: [], en: [], de: [] },
+          note: { fr: "Notre conseil : avec un bon riz chauffé !", en: "Our tip: best paired with hot sautéed rice!", de: "Unser Tipp: dazu ein guter gebratener Reis!" },
           indice: {
             fr: "Froid comme le Piton des Neiges, piquant comme la Fournaise...",
-            en: "Cold as Piton des Neiges, fiery as the volcano..."
+            en: "Cold as Piton des Neiges, fiery as the volcano...",
+            de: "Kalt wie der Piton des Neiges, feurig wie der Piton de la Fournaise..."
           },
           artKey: "piment", photo: "https://enchampthe.com/wp-content/uploads/2026/10/Green-and-Beige-Vintage-Scrapbook-Travel-Journal-Cover-A4-Document-1.png",
           cadrage: "50% 50%"
@@ -667,24 +752,34 @@
 
       const JOURS = {
         fr: ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
-        en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        de: ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"]
       };
+      const JOURS_COURTS_DE = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
       const MOIS = {
         fr: ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
-        en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        de: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
       };
 
       const P = iso => iso.split("-").map(Number);
       const addDays = (iso, n) => { const p = P(iso); return new Date(Date.UTC(p[0], p[1] - 1, p[2] + n)).toISOString().slice(0, 10); };
-      const jour = (iso, l) => JOURS[l][new Date(Date.UTC(P(iso)[0], P(iso)[1] - 1, P(iso)[2])).getUTCDay()];
-      
+      const jourIdx = iso => new Date(Date.UTC(P(iso)[0], P(iso)[1] - 1, P(iso)[2])).getUTCDay();
+      const jour = (iso, l) => JOURS[l][jourIdx(iso)];
+
       const longDate = (iso, l) => {
         const p = P(iso);
-        return l === 'en' ? `${jour(iso, l)}, ${MOIS[l][p[1] - 1]} ${p[2]}` : `${jour(iso, l)} ${p[2]} ${MOIS[l][p[1] - 1]}`;
+        const m = MOIS[l][p[1] - 1];
+        if (l === 'en') return `${jour(iso, l)}, ${m} ${p[2]}`;
+        if (l === 'de') return `${jour(iso, l)}, ${p[2]}. ${m}`;
+        return `${jour(iso, l)} ${p[2]} ${m}`;
       };
       const courtDate = (iso, l) => {
         const p = P(iso);
-        return l === 'en' ? `${jour(iso, l).slice(0, 3)}. ${MOIS[l][p[1] - 1].slice(0, 3)} ${p[2]}` : `${jour(iso, l).slice(0, 3)}. ${p[2]} ${MOIS[l][p[1] - 1].slice(0, 3)}.`;
+        const m = MOIS[l][p[1] - 1];
+        if (l === 'en') return `${jour(iso, l).slice(0, 3)}. ${m.slice(0, 3)} ${p[2]}`;
+        if (l === 'de') return `${JOURS_COURTS_DE[jourIdx(iso)]}. ${p[2]}. ${m.slice(0, 3)}.`;
+        return `${jour(iso, l).slice(0, 3)}. ${p[2]} ${m.slice(0, 3)}.`;
       };
 
       let DATE_URL = "";
@@ -709,17 +804,18 @@
       const WAX = '<svg class="mdl-env-seal" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#9A3B1F" filter="url(#mdl-wax)"/><circle cx="20" cy="20" r="11" fill="none" stroke="#F6E6D6" stroke-opacity=".6" stroke-width="1" stroke-dasharray="2 2"/><path d="M13 21 C 16 15 24 15 27 21 C 24 26 16 26 13 21 Z M13 21 L 27 21" fill="none" stroke="#FBEFE2" stroke-width="1.3"/></svg>';
 
       function getSeal(l) {
-        return `<svg class="mdl-seal" viewBox="0 0 112 112" role="img" aria-label="Cachet : ${UI[l].seal}"><defs><path id="mdl-arc" d="M56 56 m -36 0 a 36 36 0 1 1 72 0 a 36 36 0 1 1 -72 0"/></defs><circle cx="56" cy="56" r="50" fill="#9A3B1F" filter="url(#mdl-wax)"/><circle cx="56" cy="56" r="44" fill="none" stroke="#F6E6D6" stroke-opacity=".55" stroke-width="1"/><circle cx="56" cy="56" r="27" fill="none" stroke="#F6E6D6" stroke-opacity=".75" stroke-width="1.2" stroke-dasharray="2 3"/><text font-family="Jost, sans-serif" font-size="9.6" font-weight="700" letter-spacing="1.6" fill="#FBEFE2"><textPath href="#mdl-arc">${UI[l].seal}</textPath></text><g transform="translate(56 57) rotate(-40)" fill="none" stroke="#FBEFE2" stroke-width="1.6" stroke-linecap="round"><path d="M-13 0 C -6 -10 6 -10 13 0 C 6 10 -6 10 -13 0 Z"/><path d="M-13 0 L 13 0"/></g></svg>`;
+        return `<svg class="mdl-seal" viewBox="0 0 112 112" role="img" aria-label="${UI[l].seal}"><defs><path id="mdl-arc" d="M56 56 m -36 0 a 36 36 0 1 1 72 0 a 36 36 0 1 1 -72 0"/></defs><circle cx="56" cy="56" r="50" fill="#9A3B1F" filter="url(#mdl-wax)"/><circle cx="56" cy="56" r="44" fill="none" stroke="#F6E6D6" stroke-opacity=".55" stroke-width="1"/><circle cx="56" cy="56" r="27" fill="none" stroke="#F6E6D6" stroke-opacity=".75" stroke-width="1.2" stroke-dasharray="2 3"/><text font-family="Jost, sans-serif" font-size="9.6" font-weight="700" letter-spacing="1.6" fill="#FBEFE2"><textPath href="#mdl-arc">${UI[l].seal}</textPath></text><g transform="translate(56 57) rotate(-40)" fill="none" stroke="#FBEFE2" stroke-width="1.6" stroke-linecap="round"><path d="M-13 0 C -6 -10 6 -10 13 0 C 6 10 -6 10 -13 0 Z"/><path d="M-13 0 L 13 0"/></g></svg>`;
       }
 
       function getPostmark(iso, id, l) {
-        const dateNum = l === 'en' ? `${P(iso)[1]}/${P(iso)[2]}` : `${P(iso)[2]}/${P(iso)[1]}`;
+        const p = P(iso);
+        const dateNum = l === 'en' ? `${p[1]}/${p[2]}` : (l === 'de' ? `${p[2]}.${p[1]}.` : `${p[2]}/${p[1]}`);
         return `<svg class="mdl-postmark" viewBox="0 0 70 70" aria-hidden="true"><defs><path id="${id}" d="M35 35 m -24 0 a 24 24 0 1 1 48 0 a 24 24 0 1 1 -48 0"/></defs><circle cx="35" cy="35" r="31" fill="none" stroke="#6B5838" stroke-width="1.6" stroke-dasharray="3 2"/><circle cx="35" cy="35" r="18" fill="none" stroke="#6B5838" stroke-width="1"/><text font-family="Jost, sans-serif" font-size="7.2" font-weight="700" letter-spacing="1.2" fill="#6B5838"><textPath href="#${id}">${UI[l].postmarkText}</textPath></text><text x="35" y="33" text-anchor="middle" font-family="Jost, sans-serif" font-size="8" font-weight="700" fill="#6B5838">${courtDate(iso, l).split(" ")[0].toUpperCase()}</text><text x="35" y="43" text-anchor="middle" font-family="Jost, sans-serif" font-size="9" font-weight="700" fill="#6B5838">${dateNum}</text></svg>`;
       }
 
       function pageEscale(i, l) {
         const e = ESCALES_DATA[i];
-        const art = e.artKey === 'sirop' ? ART.sirop(l === 'en') : ART[e.artKey];
+        const art = e.artKey === 'sirop' ? ART.sirop(UI[l].sirop) : ART[e.artKey];
         const img = e.photo ? `<img src="${e.photo}" alt="${e.nom[l]}" style="object-position:${e.cadrage || "50% 50%"}">` : art;
         const isThisWeek = i === current;
         return `
@@ -749,7 +845,7 @@
         const first = ESCALES_DATA[0];
         return `
           <div class="mdl-entry-top">
-            <span class="mdl-date-hw">${l === 'en' ? "November 2026" : "Novembre 2026"}</span>
+            <span class="mdl-date-hw">${UI[l].moisTitre}</span>
             <span class="mdl-stamp">${UI[l].titlePage}</span>
           </div>
           <p class="mdl-garde-big">${UI[l].gardeBig}</p>
@@ -788,7 +884,7 @@
                   <span class="mdl-env-num">${UI[l].escaleNum}${i + 1} · ${courtDate(e.mercrediDate, l)}</span>
                   <span class="mdl-env-hint" style="display:block">« ${e.indice[l]} »</span>
                   ${getPostmark(revel(e), "mdl-pm" + i, l)}
-                  <span class="mdl-env-nope">${UI[l].notBefore}${longDate(revel(e), l)} !</span>
+                  <span class="mdl-env-nope">${UI[l].notBefore}${longDate(revel(e), l)}${UI[l].excl}</span>
                 </button>`;
             }).join("")}
           </div>`;
@@ -841,12 +937,15 @@
     const CLE_LANGUE = 'labyrinthe_lang';
     function langueDepart() {
       const p = new URLSearchParams(location.search).get('lang');
-      if (p === 'fr' || p === 'en') return p;
+      if (LANGUES.includes(p)) return p;
       try {
         const m = localStorage.getItem(CLE_LANGUE);
-        if (m === 'fr' || m === 'en') return m;
+        if (LANGUES.includes(m)) return m;
       } catch (e) {}
-      return (navigator.language || 'fr').toLowerCase().startsWith('en') ? 'en' : 'fr';
+      const nav = (navigator.language || 'fr').toLowerCase();
+      if (nav.startsWith('de')) return 'de';
+      if (nav.startsWith('en')) return 'en';
+      return 'fr';
     }
     let langue = langueDepart();
 
@@ -857,24 +956,36 @@
         const cle = el.getAttribute('data-t');
         if (t[cle]) el.textContent = t[cle];
       });
-      const btn = document.getElementById('btn-langue');
-      btn.textContent = t.btn;
-      btn.setAttribute('aria-label', t.btn_aria);
 
-      document.getElementById('lien-challenge').href = '/challenge-des-experts/?lang=' + langue;
-      document.getElementById('lien-zarlor').href = '/zarlor-vivant/?lang=' + langue;
+      // Boutons de langue : celui de la langue active est "enfoncé"
+      document.querySelectorAll('.btn-langue').forEach(b => {
+        b.setAttribute('aria-pressed', b.dataset.lang === langue ? 'true' : 'false');
+      });
+
+      // Petit message si les jeux ne sont pas encore dans la langue choisie
+      const note = document.getElementById('note-langue');
+      note.textContent = t.note_langue || '';
+      note.hidden = !t.note_langue;
+
+      // Langue transmise aux jeux (anglais par défaut si la langue n'y existe pas encore)
+      const langueJeux = LANGUES_JEUX.includes(langue) ? langue : 'en';
+      document.getElementById('lien-challenge').href = '/challenge-des-experts/?lang=' + langueJeux;
+      document.getElementById('lien-zarlor').href = '/zarlor-vivant/?lang=' + langueJeux;
       try { localStorage.setItem(CLE_LANGUE, langue); } catch (e) {}
-      
+
       afficherStatuts();
       if (typeof appliquerOuverture === 'function') appliquerOuverture();
-      
+
       // Mise à jour synchronisée du carnet
       MDL.update(langue);
     }
 
-    document.getElementById('btn-langue').addEventListener('click', () => {
-      langue = langue === 'fr' ? 'en' : 'fr';
-      appliquerLangue();
+    document.querySelectorAll('.btn-langue').forEach(b => {
+      b.addEventListener('click', () => {
+        if (b.dataset.lang === langue) return;
+        langue = b.dataset.lang;
+        appliquerLangue();
+      });
     });
 
     /* ===================== ZARLOR : DISPONIBILITÉ ===================== */
